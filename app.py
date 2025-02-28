@@ -1,47 +1,45 @@
-import importlib
+import streamlit as st
 
 # ---------------------- Configuração Inicial ----------------------
-st.set_page_config(
-    page_title="Gestão de Riscos - Sistema Principal", layout="wide")
+st.set_page_config(page_title="Gestão de Riscos", layout="wide")
 st.title("📊 Sistema de Gestão de Riscos")
 
-# ---------------------- Menu de Navegação ----------------------
-menu = st.sidebar.radio("Navegação", [
-    "🏠 Painel de Riscos",
-    "⚠️ Riscos",
-    "🛠️ Planos de Ação",
-    "📈 Indicadores",
-    "🔎 Auditoria",
-    "🚨 Alertas",
-    "👤 Usuários",
-    "📝 Cadastro de Risco",
-    "🔄 Atualização de Planos",
-    "📘 Documentação"
-])
+# ---------------------- Barra de Navegação Horizontal ----------------------
+menu = st.columns(7)
 
-# ---------------------- Redirecionamento das Páginas ----------------------
-pages = {
-    "🏠 Painel de Riscos": "pages.app_painel_riscos",
-    "⚠️ Riscos": "pages.app_riscos",
-    "🛠️ Planos de Ação": "pages.app_planos",
-    "📈 Indicadores": "pages.app_indicadores",
-    "🔎 Auditoria": "pages.app_auditoria",
-    "🚨 Alertas": "pages.app_alertas",
-    "👤 Usuários": "pages.app_usuarios",
-    "📝 Cadastro de Risco": "pages.app_cadastro_risco",
-    "🔄 Atualização de Planos": "pages.app_atualizar_plano",
-    "📘 Documentação": "pages.app_menu_documentacao"
-}
+if menu[0].button("🏠 Tela Inicial"):
+    from app_painel_riscos import main as painel_riscos
+    painel_riscos()
 
-if menu in pages:
-    module = importlib.import_module(pages[menu])
-    module.main()
+if menu[1].button("🔍 Identificação de Riscos"):
+    from app_riscos import main as riscos
+    riscos()
+
+if menu[2].button("📊 Avaliação de Riscos"):
+    from app_avaliacao_riscos import main as avaliacao_riscos
+    avaliacao_riscos()
+
+if menu[3].button("🛡️ Resposta ao Risco"):
+    from app_resposta_risco import main as resposta_risco
+    resposta_risco()
+
+if menu[4].button("📑 Plano de Controle"):
+    from app_plano_controle import main as plano_controle
+    plano_controle()
+
+if menu[5].button("✅ Validação do Plano"):
+    from app_validacao_plano import main as validacao_plano
+    validacao_plano()
+
+if menu[6].button("📡 Monitoramento"):
+    from app_monitoramento import main as monitoramento
+    monitoramento()
 
 # ---------------------- Rodapé ----------------------
 st.markdown("""
 ---
-📌 **Sistema de Gestão de Riscos** - Desenvolvido com ❤️ usando Streamlit
+📌 **Sistema de Gestão de Riscos** - Desenvolvido para análise e mitigação de riscos empresariais
 """)
 
 if __name__ == "__main__":
-    st.write("Escolha uma opção no menu lateral para começar.")
+    st.write("Selecione uma fase no menu acima para começar.")
