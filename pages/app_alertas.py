@@ -4,6 +4,7 @@ import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 
+
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Gestão de Riscos - Alertas", layout="wide")
 

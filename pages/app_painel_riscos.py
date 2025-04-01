@@ -1,75 +1,64 @@
 import streamlit as st
-from database_utils import run_select
 import pandas as pd
-import io
-import plotly.express as px
+from database_utils import run_select, run_query
+import datetime
 
 # ---------------------- Configuração Inicial ----------------------
-st.set_page_config(
-    page_title="Gestão de Riscos - Painel de Riscos", layout="wide")
+st.set_page_config(page_title="Painel de Gestão de Riscos", layout="wide")
+st.title("📊 Painel de Gestão de Riscos")
 
-# Função principal
+# ---------------------- Resumo de Riscos ----------------------
+st.subheader("📌 Visão Geral dos Riscos")
 
+query_resumo = """
+    SELECT categoria, COUNT(*) AS total
+    FROM riscos
+    GROUP BY categoria
+"""
+df_resumo = run_select(query_resumo)
 
-def main():
-    st.title("📊 Painel de Monitoramento de Riscos")
+if not df_resumo.empty:
+    st.bar_chart(df_resumo.set_index("categoria"))
+else:
+    st.warning("Nenhum dado disponível para exibição.")
 
-    # ---------------------- Funções Auxiliares ----------------------
-    @st.cache_data
-    def consultar_dados(query):
-        """Executa uma consulta SQL e retorna os dados como DataFrame."""
-        return run_select(query)
+# ---------------------- Alertas e Prazos ----------------------
+st.subheader("⚠️ Alertas e Prazos Críticos")
 
-    def gerar_excel(df, sheet_name="Painel_Riscos"):
-        """Gera um arquivo Excel com os dados fornecidos."""
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False, sheet_name=sheet_name)
-        output.seek(0)
-        return output
+query_alertas = """
+    SELECT nome_risco, impacto_estimado, probabilidade, status, data_identificacao 
+    FROM riscos 
+    WHERE status IN ('Aberto', 'Em Análise') 
+    AND impacto_estimado > 50000 AND probabilidade > 0.7
+    ORDER BY data_identificacao DESC
+"""
+df_alertas = run_select(query_alertas)
 
-    # ---------------------- Painel de Indicadores ----------------------
-    st.subheader("📊 Resumo Geral de Riscos")
+if df_alertas.empty:
+    st.success("✅ Nenhum alerta crítico no momento.")
+else:
+    st.error("🚨 Existem riscos críticos que requerem atenção!")
+    st.dataframe(df_alertas, use_container_width=True)
 
-    query_resumo = """
-        SELECT categoria, COUNT(*) as total 
-        FROM riscos 
-        GROUP BY categoria
-    """
-    df_resumo = consultar_dados(query_resumo)
+# ---------------------- Monitoramento e Insights Preditivos ----------------------
+st.subheader("🧠 Insights Preditivos sobre Riscos")
 
-    if not df_resumo.empty:
-        fig = px.pie(df_resumo, values='total', names='categoria',
-                     title="Distribuição de Riscos por Categoria")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("⚠️ Nenhum dado disponível para exibição.")
+query_insights = """
+    SELECT nome_risco, categoria, impacto_estimado, probabilidade
+    FROM riscos
+    WHERE impacto_estimado > 40000
+    ORDER BY probabilidade DESC
+    LIMIT 5
+"""
+df_insights = run_select(query_insights)
 
-    # ---------------------- Lista de Riscos Recentes ----------------------
-    st.subheader("📋 Últimos Riscos Identificados")
-    query_riscos = """
-        SELECT id_risco, nome_risco, descricao, impacto_estimado, probabilidade, status, data_identificacao 
-        FROM riscos 
-        ORDER BY data_identificacao DESC 
-        LIMIT 10
-    """
-    df_riscos = consultar_dados(query_riscos)
+if not df_insights.empty:
+    st.dataframe(df_insights, use_container_width=True)
+else:
+    st.info("Nenhum risco de alto impacto detectado.")
 
-    if not df_riscos.empty:
-        st.dataframe(df_riscos, use_container_width=True)
-    else:
-        st.warning("⚠️ Nenhum risco recente encontrado.")
-
-    # ---------------------- Exportação ----------------------
-    if not df_riscos.empty:
-        excel_file = gerar_excel(df_riscos)
-        st.download_button(
-            label="📥 Baixar Relatório Completo de Riscos",
-            data=excel_file,
-            file_name="Painel_Gestao_Riscos.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
+st.markdown("---")
+st.write("🔍 O painel de gestão de riscos exibe análises preditivas e permite uma visão estratégica dos riscos em tempo real.")
 
 if __name__ == "__main__":
-    main()
+    st.write("Escolha uma opção no menu lateral para acessar módulos específicos.")

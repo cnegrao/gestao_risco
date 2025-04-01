@@ -1,67 +1,51 @@
 import streamlit as st
-from database_utils import run_select
 import pandas as pd
-import io
+from database_utils import run_select, run_query
 
 # ---------------------- Configuração Inicial ----------------------
-st.set_page_config(page_title="Gestão de Riscos - Visualização", layout="wide")
+st.set_page_config(page_title="Identificação de Riscos", layout="wide")
+st.title("⚠️ Identificação de Riscos")
 
-# Função principal
+# ---------------------- Cadastro de Riscos ----------------------
+st.subheader("📌 Cadastro e Detalhamento do Risco")
 
+# Formulário para inserção de riscos
+nome_risco = st.text_input("Nome do Risco")
+descricao = st.text_area("Descrição do Risco")
+categoria = st.selectbox("Categoria do Risco", [
+                         "Operacional", "Financeiro", "Tecnológico", "Legal", "Estratégico"])
+causas = st.text_area("Causas (separadas por vírgula)")
+consequencias = st.text_area("Consequências (separadas por vírgula)")
 
-def main():
-    st.title("📊 Visualização de Riscos")
+if st.button("💾 Salvar Risco"):
+    if nome_risco and descricao:
+        query = """
+        INSERT INTO riscos (nome_risco, descricao, categoria, causas, consequencias, data_identificacao)
+        VALUES (%s, %s, %s, %s, %s, CURRENT_DATE)
+        """
+        run_query(query, (nome_risco, descricao,
+                  categoria, causas, consequencias))
+        st.success("✅ Risco cadastrado com sucesso!")
+    else:
+        st.warning("⚠️ Preencha todos os campos obrigatórios.")
 
-    # ---------------------- Funções Auxiliares ----------------------
-    @st.cache_data
-    def consultar_dados(query):
-        """Executa uma consulta SQL e retorna os dados como DataFrame."""
-        return run_select(query)
+# ---------------------- Lista de Riscos Cadastrados ----------------------
+st.subheader("📋 Riscos Identificados")
 
-    def gerar_excel(df, sheet_name="Riscos"):
-        """Gera um arquivo Excel com os dados fornecidos."""
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False, sheet_name=sheet_name)
-        output.seek(0)
-        return output
+query_listagem = """
+    SELECT nome_risco, categoria, descricao, causas, consequencias, data_identificacao
+    FROM riscos
+    ORDER BY data_identificacao DESC
+"""
+df_riscos = run_select(query_listagem)
 
-    # ---------------------- Interface Principal ----------------------
-    st.sidebar.header("Filtros de Risco")
+if not df_riscos.empty:
+    st.dataframe(df_riscos, use_container_width=True)
+else:
+    st.info("Nenhum risco cadastrado até o momento.")
 
-    # 🔹 Seleção de Categoria de Risco
-    categoria = st.sidebar.selectbox("Selecione a Categoria de Risco", [
-                                     "Operacional", "Financeiro", "Tecnológico", "Legal", "Estratégico"])
-
-    # 🔹 Filtro de Status do Risco
-    status = st.sidebar.selectbox(
-        "Status do Risco", ["Aberto", "Em Análise", "Mitigado", "Encerrado"])
-
-    # 🔹 Botão para Buscar Dados
-    if st.sidebar.button("🔍 Buscar Riscos"):
-        query = f"""
-        SELECT id_risco, nome_risco, descricao, impacto_estimado, probabilidade, status, data_identificacao 
-        FROM riscos 
-        WHERE categoria = '{categoria}' AND status = '{status}'
-        ORDER BY data_identificacao DESC"""
-        df_riscos = consultar_dados(query)
-
-        if df_riscos.empty:
-            st.warning(
-                "⚠️ Nenhum risco encontrado para os filtros selecionados.")
-        else:
-            st.subheader("📋 Riscos Identificados")
-            st.dataframe(df_riscos, use_container_width=True)
-
-            # Exportação para Excel
-            excel_file = gerar_excel(df_riscos)
-            st.download_button(
-                label="📥 Baixar Relatório Excel",
-                data=excel_file,
-                file_name="Relatorio_Riscos.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-
+st.markdown("---")
+st.write("📊 Utilize esta tela para registrar e acompanhar os riscos organizacionais.")
 
 if __name__ == "__main__":
-    main()
+    st.write("Escolha uma opção no menu lateral para acessar outras funcionalidades.")
