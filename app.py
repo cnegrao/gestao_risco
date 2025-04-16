@@ -28,9 +28,9 @@ elif page == "Fase 2 - Identificação de Riscos":
     from pages.riscos_identificacao import main as riscos_identificacao
     riscos_identificacao()
 
-elif page == "Fase 3 - Análise de Riscos":
-    from pages.app_avaliacao_riscos import main as avaliacao_riscos
-    avaliacao_riscos()
+elif page == "Fase 3 - Avaliação de Riscos":
+    from pages.riscos_avaliacao import main as riscos_avaliacao
+    riscos_avaliacao()
 
 elif page == "Fase 4 - Resposta ao Risco":
     from pages.app_resposta_risco import main as resposta_risco
