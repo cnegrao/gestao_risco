@@ -13,11 +13,8 @@ def evenly_spaced_positions(n, start=0.1, end=0.9):
 
 
 def main():
-    st.markdown("### Busca Inteligente de Riscos (POC)")
-    st.write(
-        "Digite sua consulta para buscar riscos. Nesta versão POC, a busca é feita de forma textual (usando ILIKE) "
-        "para aproximar uma busca semântica. Em produção, recomenda-se utilizar embeddings e similaridade de cosseno."
-    )
+    st.markdown("### Fase 2 - Identificação de Riscos ###")
+    st.write("Digite sua consulta para buscar riscos. A busca é feita textual (usando ILIKE) e os dados normalizados são usados para gerar o diagrama Sankey.")
 
     # Variáveis de sessão
     if "search_query" not in st.session_state:
@@ -28,47 +25,29 @@ def main():
     # Formulário de busca
     with st.form(key="search_form"):
         search_query = st.text_input(
-            "Digite sua consulta:",
-            value=st.session_state.search_query,
-            key="input_search_query"
-        )
+            "Digite o contexto do mapeamento de riscos:", value=st.session_state.search_query, key="input_search_query")
         submit_search = st.form_submit_button("🔍 Buscar Riscos")
         if submit_search:
             if search_query.strip():
                 st.session_state.search_query = search_query.strip()
                 like_query = f"%{st.session_state.search_query}%"
-                # Query ajustada para o novo modelo 3FN, incluindo a coluna de processo na busca:
+                # Query simplificada: retorna 1 linha por risco
                 query = """
                 SELECT 
                   r.id_risco,
-                  r.id_empresa,
                   r.nome_risco,
                   r.descricao,
-                  r.impacto_estimado,
-                  r.probabilidade,
-                  r.status,
-                  r.data_identificacao,
                   r.criticidade,
-                  p.nome_processo,
-                  sp.nome_subprocesso,
-                  ca.descricao_causa AS causa,
-                  cons.descricao_consequencia AS consequencia
+                  p.nome_processo
                 FROM tb_riscos r
                 LEFT JOIN tb_subprocessos sp ON r.id_subprocesso = sp.id_subprocesso
                 LEFT JOIN tb_processos p ON sp.id_processo = p.id_processo
-                LEFT JOIN tb_risco_causa rc ON r.id_risco = rc.id_risco
-                LEFT JOIN tb_causas ca ON rc.id_causa = ca.id_causa
-                LEFT JOIN tb_risco_consequencia rcons ON r.id_risco = rcons.id_risco
-                LEFT JOIN tb_consequencias cons ON rcons.id_consequencia = cons.id_consequencia
                 WHERE r.nome_risco ILIKE %s
                    OR r.descricao ILIKE %s
-                   OR ca.descricao_causa ILIKE %s
-                   OR sp.nome_subprocesso ILIKE %s
                    OR p.nome_processo ILIKE %s
                 ORDER BY r.data_identificacao DESC;
                 """
-                params = (like_query, like_query,
-                          like_query, like_query, like_query)
+                params = (like_query, like_query, like_query)
                 df = run_select(query, params)
                 st.session_state.df_riscos = df
             else:
@@ -80,18 +59,17 @@ def main():
         if df_riscos.empty:
             st.info("Nenhum risco encontrado para a consulta.")
         else:
-            st.write("Selecione os riscos desejados:")
-            gb = GridOptionsBuilder.from_dataframe(df_riscos)
+            st.write("Riscos encontrados:")
+            # Exibir apenas as colunas desejadas
+            df_display = df_riscos[["id_risco", "nome_risco",
+                                    "descricao", "criticidade", "nome_processo"]]
+            gb = GridOptionsBuilder.from_dataframe(df_display)
             gb.configure_selection("multiple", use_checkbox=True,
-                                   groupSelectsChildren=True, suppressRowClickSelection=False)
+                                   groupSelectsChildren=True, suppressRowClickSelection=True)
             grid_options = gb.build()
-            grid_response = AgGrid(
-                df_riscos,
-                gridOptions=grid_options,
-                update_mode=GridUpdateMode.SELECTION_CHANGED,
-                height=300,
-                fit_columns_on_grid_load=True
-            )
+            grid_response = AgGrid(df_display, gridOptions=grid_options,
+                                   update_mode=GridUpdateMode.SELECTION_CHANGED,
+                                   height=300, fit_columns_on_grid_load=True)
 
             # Extração dos riscos selecionados
             selected_rows = grid_response.get("selected_rows")
@@ -100,83 +78,83 @@ def main():
             elif selected_rows is None:
                 selected_rows = []
 
-            # Criação do Sankey (apenas para os riscos selecionados)
+            st.write("IDs dos riscos selecionados:", [
+                     row["id_risco"] for row in selected_rows])
+
+            # Geração do Sankey para os riscos selecionados
             if selected_rows:
-                selected_df = pd.DataFrame(selected_rows)
-                unique_risks = selected_df['nome_risco'].unique()
-                for risk in unique_risks:
-                    group = selected_df[selected_df['nome_risco'] == risk]
-                    # Obtenha os valores únicos para causas e consequências, removendo possíveis nulos
-                    unique_causes = group['causa'].dropna().unique().tolist()
-                    unique_cons = group['consequencia'].dropna(
-                    ).unique().tolist()
-                    nodes = unique_causes + [risk] + unique_cons
-                    N_c = len(unique_causes)
-                    risk_index = N_c  # nó do risco no meio
+                for row in selected_rows:
+                    risk_id = row["id_risco"]
+                    # Query para obter causas e consequências (dados normalizados)
+                    sankey_query = """
+                    SELECT 
+                        ca.descricao_causa AS causa,
+                        cons.descricao_consequencia AS consequencia
+                    FROM tb_risco_causa rc
+                    LEFT JOIN tb_causas ca ON rc.id_causa = ca.id_causa
+                    LEFT JOIN tb_risco_consequencia rcons ON rc.id_risco = rcons.id_risco
+                    LEFT JOIN tb_consequencias cons ON rcons.id_consequencia = cons.id_consequencia
+                    WHERE rc.id_risco = %s;
+                    """
+                    sankey_df = run_select(sankey_query, (risk_id,))
+                    if sankey_df.empty:
+                        st.info(
+                            f"Nenhuma causa ou consequência encontrada para o risco {risk_id}.")
+                    else:
+                        # Extrai valores únicos
+                        unique_causes = sankey_df['causa'].dropna(
+                        ).unique().tolist()
+                        unique_cons = sankey_df['consequencia'].dropna(
+                        ).unique().tolist()
+                        # Constrói os nós: causas, nome do risco e consequências
+                        nodes = unique_causes + \
+                            [row["nome_risco"]] + unique_cons
+                        N_c = len(unique_causes)
+                        risk_index = N_c  # O nó do risco fica logo após as causas
 
-                    sources = []
-                    targets = []
-                    values = []
-                    # Para cada causa única, cria um link do nó de causa para o nó do risco
-                    for i in range(N_c):
-                        sources.append(i)
-                        targets.append(risk_index)
-                        values.append(1)
-                    # Para cada consequência única, cria um link do nó do risco para o nó de consequência
-                    for j in range(len(unique_cons)):
-                        sources.append(risk_index)
-                        targets.append(N_c + 1 + j)
-                        values.append(1)
+                        # Define os links: de cada causa para o risco e do risco para cada consequência
+                        # índices 0 até N_c-1 (causas)
+                        sources = list(range(N_c))
+                        targets = [risk_index] * N_c
+                        values = [1] * N_c
+                        sources += [risk_index] * len(unique_cons)
+                        targets += [risk_index + 1 +
+                                    i for i in range(len(unique_cons))]
+                        values += [1] * len(unique_cons)
 
-                    x_causes = [0] * N_c
-                    y_causes = evenly_spaced_positions(N_c)
-                    x_risk = [0.5]
-                    y_risk = [0.5]
-                    x_cons = [1] * len(unique_cons)
-                    y_cons = evenly_spaced_positions(len(unique_cons))
-                    x_positions = x_causes + x_risk + x_cons
-                    y_positions = y_causes + y_risk + y_cons
+                        # Define posições para os nós
+                        x_causes = [0] * N_c
+                        y_causes = evenly_spaced_positions(N_c)
+                        x_risk = [0.5]
+                        y_risk = [0.5]
+                        x_cons = [1] * len(unique_cons)
+                        y_cons = evenly_spaced_positions(len(unique_cons))
+                        x_positions = x_causes + x_risk + x_cons
+                        y_positions = y_causes + y_risk + y_cons
 
-                    fig = go.Figure(data=[go.Sankey(
-                        arrangement="fixed",
-                        node=dict(
-                            pad=15,
-                            thickness=20,
-                            line=dict(color="black", width=1),
-                            label=nodes,
-                            color="blue",
-                            x=x_positions,
-                            y=y_positions
-                        ),
-                        link=dict(
-                            source=sources,
-                            target=targets,
-                            value=values,
-                            line=dict(color="black", width=1)
-                        )
-                    )])
-                    fig.update_layout(
-                        title_text=f"Sankey para Risco: {risk}", font_size=10)
-                    st.plotly_chart(fig, use_container_width=True)
+                        fig = go.Figure(data=[go.Sankey(
+                            arrangement="fixed",
+                            node=dict(
+                                pad=15,
+                                thickness=10,
+                                line=dict(color="black", width=1),
+                                label=nodes,
+                                color="skyblue",
+                                x=x_positions,
+                                y=y_positions
+                            ),
+                            link=dict(
+                                source=sources,
+                                target=targets,
+                                value=values,
+                                line=dict(color="black", width=1)
+                            )
+                        )])
+                        fig.update_layout(
+                            title_text=f"Sankey para Risco {risk_id}: {row['nome_risco']}", font_size=10)
+                        st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Selecione pelo menos um risco para visualizar o Sankey.")
-
-            # Exibe os IDs dos riscos selecionados
-            selected_ids = []
-            for row in selected_rows:
-                if isinstance(row, dict):
-                    risk_id = row.get("id_risco")
-                    company_id = row.get("id_empresa")
-                    if risk_id is not None and company_id is not None:
-                        selected_ids.append((risk_id, company_id))
-                    else:
-                        st.error(
-                            f"Chave 'id_risco' ou 'id_empresa' não encontrada na linha: {row}")
-                else:
-                    st.error(f"Tipo inesperado: {type(row)} - {row}")
-
-            st.write(
-                "IDs dos riscos selecionados (id_risco, id_empresa):", selected_ids)
 
             # Formulário para salvar os riscos selecionados
             with st.form(key="save_selected_form"):
@@ -198,20 +176,18 @@ def main():
                     );
                     """
                     run_query(create_table_query)
-
                     count = 0
-                    st.write("IDs que serão gravados:", selected_ids)
-                    for risk_id, company_id in selected_ids:
+                    for row in selected_rows:
+                        risk_id = row["id_risco"]
                         insert_query = """
                         INSERT INTO tb_risco_selecionado (id_empresa, id_risco, usuario, observacoes)
                         VALUES (%s, %s, %s, %s);
                         """
-                        params_insert = (company_id, risk_id,
-                                         usuario, observacoes)
+                        params_insert = (1, risk_id, usuario, observacoes)
                         run_query(insert_query, params_insert)
                         count += 1
                     st.success(
-                        f"{count} risco(s) selecionado(s) e associados à empresa com sucesso!")
+                        f"{count} risco(s) selecionado(s) salvos com sucesso!")
 
     st.markdown("---")
     st.write("Utilize esta ferramenta para buscar e associar riscos à sua empresa de forma inteligente (POC).")
