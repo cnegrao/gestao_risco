@@ -1,28 +1,30 @@
 import streamlit as st
+st.set_page_config(page_title="Gestão de Riscos", layout="wide")
+
 
 # ---------------------- Configuração Inicial ----------------------
-st.set_page_config(page_title="Gestão de Riscos", layout="wide")
+
 st.title("📊 Sistema de Gestão de Riscos")
 
 # ---------------------- Navegação por Fases via Radio ----------------------
 page = st.sidebar.radio(
     "Navegação por Fases",
     [
-        "Tela Inicial - Painel de Riscos",
+        "Tela Inicial - Contexto de Riscos",
         "Fase 2 - Identificação de Riscos",
         "Fase 3 - Avaliação de Riscos",
         "Fase 4 - Resposta ao Risco",
-        "Fase 5 - Plano de Controle",
-        "Fase 6 - Validação do Plano",
-        "Fase 7 - Monitoramento",
+        "Fase 5 - Plano de Tratamento de Risco",
+        "Fase 6 - Validação do Plano --sai",
+        "Fase 7 - Dashboard de Riscos",
         "Gerenciamento de Usuários"
     ],
     index=1  # Define como padrão a Fase 2 - Identificação de Riscos
 )
 
 if page == "Tela Inicial - Painel de Riscos":
-    from pages.app_painel_riscos import main as painel_riscos
-    painel_riscos()
+    from pages.riscos_dash import main as riscos_dash
+    riscos_dash()
 
 elif page == "Fase 2 - Identificação de Riscos":
     from pages.riscos_identificacao import main as riscos_identificacao
