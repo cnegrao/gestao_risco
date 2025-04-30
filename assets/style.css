@@ -1,0 +1,172 @@
+/* ===============================
+   SAFEBIS - Sistema de Gestão de Riscos
+   Arquivo: assets/style.css
+   =============================== */
+
+   :root {
+    /* Paleta de cores */
+    --color-primary: #66bb6a;
+    --color-primary-dark: #388e3c;
+    --color-background: #0b213d;
+    --color-surface: #132a51;
+    --color-text-primary: #f5f5f5;
+    --color-text-secondary: #cfcfcf;
+    --color-border: #264060;
+    --color-accent: #ff8800;
+  }
+  
+  /* ===============================
+     Global & Typography
+     =============================== */
+  body, .stApp {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-accent);
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 600;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  /* ===============================
+     Top Bar
+     =============================== */
+  .top-bar {
+    width: 100%;
+    background-color: var(--color-surface);
+    padding: 12px 20px;
+    margin-bottom: 1rem;
+  }
+  .top-bar h2 {
+    color: var(--color-accent);
+    margin: 0;
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  
+  /* ===============================
+     Sidebar
+     =============================== */
+  [data-testid="stSidebar"] {
+    background-color: var(--color-surface) !important;
+    border-right: 1px solid var(--color-border);
+    padding-top: 1rem;
+  }
+  
+  [data-testid="stSidebar"] img {
+    margin: 0 auto;
+    display: block;
+    max-width: 90%;
+    margin-bottom: 1rem;
+  }
+  
+  /* Navegação por fases */
+  [data-testid="stSidebar"] .stRadio label {
+    font-size: 1rem;
+    padding: 0.75em 1em;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    color: var(--color-text-primary);
+  }
+  [data-testid="stSidebar"] .stRadio label:hover {
+    background-color: rgba(255,255,255,0.05);
+  }
+  [data-testid="stSidebar"] .stRadio input:checked + label::before {
+    border-color: var(--color-primary) !important;
+    background-color: var(--color-primary) !important;
+  }
+  [data-testid="stSidebar"] .stRadio input:checked + label {
+    color: var(--color-primary) !important;
+    font-weight: 600;
+  }
+  
+  /* ===============================
+     Buttons
+     =============================== */
+  .stButton > button {
+    background-color: var(--color-primary);
+    color: var(--color-text-primary);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6em 1.2em;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .stButton > button:hover {
+    background-color: var(--color-primary-dark);
+    transform: scale(1.02);
+  }
+  
+  /* ===============================
+     DataFrames & Tables
+     =============================== */
+  .stDataFrame table, .streamlit-expanderHeader {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+  .stDataFrame table th, .stDataFrame table td {
+    border: 1px solid var(--color-border);
+    padding: 8px;
+  }
+  
+  /* ===============================
+     AG Grid Overrides
+     =============================== */
+  .ag-theme-alpine-dark {
+    background-color: var(--color-background) !important;
+    color: var(--color-text-primary) !important;
+  }
+  .ag-theme-alpine-dark .ag-header {
+    background-color: var(--color-surface) !important;
+    border-bottom: 1px solid var(--color-border) !important;
+  }
+  .ag-theme-alpine-dark .ag-cell,
+  .ag-theme-alpine-dark .ag-row,
+  .ag-theme-alpine-dark .ag-body-viewport {
+    background-color: var(--color-background) !important;
+    color: var(--color-text-primary) !important;
+  }
+  
+  /* ===============================
+     Risk Classes (Charts)
+     =============================== */
+  .risk-low { fill: var(--color-risk-low) !important; }
+  .risk-medium { fill: var(--color-risk-medium) !important; }
+  .risk-high { fill: var(--color-risk-high) !important; }
+  .risk-critical { fill: var(--color-risk-critical) !important; }
+  
+  /* ===============================
+     Links
+     =============================== */
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* ===============================
+     Scrollbar
+     =============================== */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 4px;
+  }
+  
