@@ -9,22 +9,19 @@ st.set_page_config(
 )
 
 # ---------------------- Logo na Sidebar ----------------------
-# Exibe o logo acima da navegação na sidebar
 logo_dir = os.path.join(os.path.dirname(__file__), 'imagens')
-for fname in ['logo.png', 'logo.jpeg', 'logo.ppg']:
+logo_path = None
+for fname in ['logo.png', 'logo.jpg', 'logo.jpeg', 'logo.ppg']:
     potential = os.path.join(logo_dir, fname)
     if os.path.exists(potential):
         logo_path = potential
         break
-else:
-    logo_path = None
 
 if logo_path:
-    # Atualizado para usar use_container_width em vez de use_column_width
     st.sidebar.image(logo_path, use_container_width=True)
 else:
     st.sidebar.markdown(
-        "<div style='width:100%;height:150px;background-color:#ccc;border-radius:8px; margin-bottom:10px;'></div>",
+        "<div style='width:100%;height:150px;background-color:var(--color-surface);border-radius:8px; margin-bottom:10px;'></div>",
         unsafe_allow_html=True
     )
 
@@ -45,11 +42,9 @@ page = st.sidebar.radio(
 )
 
 # ---------------------- Top Bar ----------------------
-# Barra horizontal azul com título, acima do conteúdo principal
+# Renderiza banner superior via classe CSS .top-bar
 st.markdown(
-    "<div style='width:100%; background-color:#003366; padding:12px 20px;'>"
-    "<h2 style='color:white; margin:0;'>SAFEBIS - Sistema de Gestão de Riscos</h2>"
-    "</div>",
+    '<div class="top-bar"><h2>SAFEBIS - Sistema de Gestão de Riscos</h2></div>',
     unsafe_allow_html=True
 )
 
@@ -80,7 +75,7 @@ elif page == "Gerenciamento de Usuários":
 st.markdown(
     """
     ---
-    <p style='text-align:center; color:#666;'>
+    <p style='text-align:center; color:var(--color-text-secondary);'>
     &copy; 2025 SAFEBIS - Todos os direitos reservados
     </p>
     """,
