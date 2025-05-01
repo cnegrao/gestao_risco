@@ -1,116 +1,61 @@
-/* ===== SafeBis Global Theme ===== */
-:root {
-  --color-bg-dark: #121212;
-  --color-sidebar-bg: #1f2937;
-  --color-topbar-bg: #003366;
-  --color-primary-green: #3FC365;
-  --color-text-primary: #e0e0e0;
-  --color-text-secondary: #a0a0a0;
-  --color-border: #2c2f33;
-  --color-surface: #1e1e1e;
-}
+/* 1) Importa a Roboto do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap');
 
-/* Body and App */
+/* 2) Global */
 body, .stApp {
-  background-color: var(--color-bg-dark) !important;
-  color: var(--color-text-primary) !important;
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
+  background-color: #0E1117 !important;
+  color: #EFEFEF !important;
+  font-family: 'Roboto', sans-serif !important;
 }
 
-/* Top Bar */
+/* 3) Top-bar personalizada (injetada via Markdown) */
 .top-bar {
-  background-color: var(--color-topbar-bg) !important;
-  padding: 0.75rem 1.5rem !important;
-  margin-bottom: 1rem !important;
-  border-radius: 0px !important;
-}
-.top-bar h2 {
-  color: white !important;
-  margin: 0 !important;
-  font-size: 1.5rem !important;
+  background-color: #003366;
+  padding: 12px 20px;
+  border-radius: 4px;
+  margin-bottom: 24px;
 }
 
-/* Sidebar */
+/* 4) Sidebar */
 [data-testid="stSidebar"] {
-  background-color: var(--color-sidebar-bg) !important;
-  padding-top: 1rem !important;
+  background-color: #003366 !important;
+  padding: 20px 12px !important;
 }
 
-/* Sidebar logo container */
-stSidebar img {
+/* 5) Logo na sidebar */
+[data-testid="stSidebar"] img {
+  width: 100%;
   border-radius: 8px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 20px;
 }
 
-/* Navigation Header */
-stSidebar h1, stSidebar h2, stSidebar h3, .css-1avcm0n h2 {
-  color: white !important;
-  margin-bottom: 0.5rem !important;
+/* 6) Título “Navegação por Fases” */
+[data-testid="stSidebar"] h2 {
+  color: #FFFFFF !important;
+  margin-top: 0 !important;
+  margin-bottom: 16px !important;
 }
 
-/* Radio buttons styling */
-/* unselected */
-.stRadio button {
-  color: var(--color-text-primary) !important;
-}
-/* selected */
-.stRadio [data-testid="stRadio"] input:checked + div > div {
-  background-color: var(--color-primary-green) !important;
-  border-color: var(--color-primary-green) !important;
+/* 7) Cores dos labels de rádio */
+[role="radiogroup"] label {
+  color: #EFEFEF !important;
 }
 
-/* Content headings */
-h1, h2, h3, h4, h5 {
-  color: white !important;
-  font-weight: 600;
-}
-
-/* Buttons */
+/* 8) Botões streamlit */
 .stButton > button {
-  background-color: var(--color-primary-green) !important;
-  color: #ffffff !important;
-  border: none;
+  background-color: #4CAF50 !important;
+  color: #FFFFFF !important;
   border-radius: 6px !important;
-  padding: 0.6rem 1.2rem !important;
-  font-size: 0.9rem !important;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
 }
 .stButton > button:hover {
-  background-color: #32af49 !important;
-  transform: scale(1.02);
+  background-color: #43A047 !important;
 }
 
-/* Tables and DataFrames */
-.stDataFrame table {
-  border-color: var(--color-border) !important;
-}
-.stDataFrame table th, .stDataFrame table td {
-  background-color: var(--color-surface) !important;
-  color: var(--color-text-primary) !important;
-}
-.stDataFrame table th {
-  border-bottom: 1px solid var(--color-border) !important;
-}
-
-/* AG Grid Overrides */
+/* 9) AG-Grid Dark Theme override */
 .ag-theme-alpine-dark {
-    background-color: var(--color-bg-dark) !important;
-    color: var(--color-text-primary) !important;
+  background-color: #0E1117 !important;
+  color: #EFEFEF !important;
 }
-.ag-theme-alpine-dark .ag-header {
-    background-color: var(--color-surface) !important;
-    border-bottom: 1px solid var(--color-border) !important;
-}
-
-/* Hide default Streamlit header & footer */
-header, footer {
-  visibility: hidden;
-  height: 0;
-  margin: 0;
-  padding: 0;
-}
+/* Certifique-se de que seu AG-Grid use theme="ag-theme-alpine-dark" */

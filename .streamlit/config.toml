@@ -1,0 +1,11 @@
+[theme]
+# Cor principal (botões, destaques)
+primaryColor = "#4CAF50"
+# Fundo geral do app
+backgroundColor = "#0E1117"
+# Fundo dos containers secundários (sidebar, top-bar)
+secondaryBackgroundColor = "#003366"
+# Cor do texto
+textColor = "#EFEFEF"
+# Fonte padrão
+font = "Roboto"
