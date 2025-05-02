@@ -1,16 +1,18 @@
 /* ---------------- Global ---------------- */
 body, .stApp {
-  background-color: #0A0F1D;       /* tom quase preto */
-  color: #F2F2F2;                  /* texto claro */
+  background-color: #0A0F1D;
+  color: #F2F2F2;
   font-family: 'Roboto', sans-serif;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
-/*  Top Bar  */
+/*  Top Bar (Título da aplicação)  */
 .top-bar {
-  background: #003366;             /* azul escuro Safebis */
+  background: #003366;
   padding: 12px 20px;
   margin-bottom: 1rem;
+  border-radius: 4px;
 }
 .top-bar h2 {
   color: #FFFFFF;
@@ -19,9 +21,23 @@ body, .stApp {
   font-weight: 600;
 }
 
+/*  Phase Bar (Título de cada fase)  */
+.phase-bar {
+  background: #002F6C;
+  padding: 10px 16px;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+.phase-bar h3 {
+  color: #FFFFFF;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
 /*  Sidebar  */
 [data-testid="stSidebar"] {
-  background: #002244; /* azul ainda mais escuro */
+  background: #002244;
   color: #F2F2F2;
   padding-top: 1rem;
 }
@@ -33,7 +49,7 @@ body, .stApp {
   margin-bottom: 1rem;
 }
 
-/*  Títulos  */
+/*  Títulos gerais  */
 h1, h2, h3, h4, h5 {
   color: #FFFFFF;
   font-weight: 600;
@@ -54,7 +70,7 @@ h1, h2, h3, h4, h5 {
 
 /*  Radios Selecionados  */
 .stRadio > div > label[aria-checked="true"] {
-  color: #0DAFFF !important;  /* tom claro de destaque */
+  color: #0DAFFF !important;
 }
 
 /*  AG-Grid Theme Override  */
@@ -72,4 +88,49 @@ h1, h2, h3, h4, h5 {
   color: #888888;
   margin: 2rem 0 1rem;
   font-size: 0.9rem;
+}
+
+/* Se quiser garantir que o gráfico tenha fundo transparente */
+.stPlotlyChart > div {
+  background: transparent !important;
+}
+
+/* Um espacinho extra abaixo do gráfico */
+.stPlotlyChart {
+  margin-bottom: 2rem;
+}
+
+/* ----------------------------------------- */
+/* Header Secundário (usado em sub-páginas) */
+/* ----------------------------------------- */
+.secondary-bar {
+  background: #003366;      /* mesmo tom Safebis da .top-bar */
+  padding: 10px 20px;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+.secondary-bar h2, 
+.secondary-bar h3 {
+  color: #ffffff;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ----------------------------------------- */
+/* Footer (caso use .footer)                */
+/* ----------------------------------------- */
+.footer {
+  text-align: center;
+  color: #888888;
+  margin: 2rem 0 1rem;
+  font-size: 0.9rem;
+}
+
+/* ----------------------------------------- */
+/* Anotações acima do Sankey                 */
+/* ----------------------------------------- */
+.plotly-annotation {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.9rem !important;
+  color: #F2F2F2 !important;
 }
