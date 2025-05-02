@@ -134,3 +134,12 @@ h1, h2, h3, h4, h5 {
   font-size: 0.9rem !important;
   color: #F2F2F2 !important;
 }
+
+h1 {
+  font-size: 2.2rem !important;
+}
+h2 {
+  font-size: 1.4rem !important;
+  margin-top: -0.5rem;
+  color: #ccc;
+}

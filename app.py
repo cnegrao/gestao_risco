@@ -1,15 +1,14 @@
-import streamlit as st
 from pathlib import Path
-import os
+import streamlit as st
 
-# ─── 1) Configuração de Página ───────────────────────────────────────────────
+# 1️⃣ CONFIGURAÇÃO DE PÁGINA (sempre em primeiríssima linha após imports)
 st.set_page_config(
-    page_title="SAFEBIS – Sistema de Gestão de Riscos",
+    page_title="SafeBis – Sistema de Gestão de Riscos",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ─── 2) Injeta o CSS de assets/style.css ────────────────────────────────────
+# 2️⃣ INJEÇÃO DO CSS
 css_path = Path(__file__).parent / "assets" / "style.css"
 if css_path.exists():
     css = css_path.read_text(encoding="utf-8")
@@ -17,7 +16,7 @@ if css_path.exists():
 else:
     st.warning("⚠️ Não encontrei assets/style.css")
 
-# ─── 3) Logo na Sidebar ─────────────────────────────────────────────────────
+# 3️⃣ LOGO NA SIDEBAR
 logo_path = Path(__file__).parent / "imagens" / "logo.jpeg"
 if logo_path.exists():
     st.sidebar.image(str(logo_path), use_container_width=True)
@@ -27,8 +26,10 @@ else:
         unsafe_allow_html=True
     )
 
-# ─── 4) Navegação ────────────────────────────────────────────────────────────
-st.sidebar.markdown("## Navegação por Fases")
+# 4️⃣ TÍTULO DA SIDEBAR
+st.sidebar.markdown("# Navegação por Fases")
+
+# 5️⃣ RÁDIO DE NAVEGAÇÃO
 page = st.sidebar.radio(
     "",
     [
@@ -43,49 +44,23 @@ page = st.sidebar.radio(
     index=0
 )
 
-# ─── 5) Top Bar ───────────────────────────────────────────────────────────────
+# 6️⃣ BARRA SUPERIOR FIXA
 st.markdown(
     '<div class="top-bar">'
-    '  <h2>SAFEBIS – Sistema de Gestão de Riscos</h2>'
+    '<h2>SafeBis – Sistema de Gestão de Riscos</h2>'
     '</div>',
     unsafe_allow_html=True
 )
 
-# ─── 6) Rotas ─────────────────────────────────────────────────────────────────
+# 7️⃣ CHAMADA DAS PÁGINAS
 if page == "Tela Inicial - Contexto de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
     riscos_dash()
-
 elif page == "Fase 2 - Identificação de Riscos":
     from app_modules.riscos_identificacao import main as riscos_identificacao
     riscos_identificacao()
+# ... siga para as demais fases
 
-elif page == "Fase 3 - Avaliação de Riscos":
-    from app_modules.riscos_avaliacao import main as riscos_avaliacao
-    riscos_avaliacao()
-
-elif page == "Fase 4 - Resposta ao Risco":
-    from app_modules.app_resposta_risco import main as resposta_risco
-    resposta_risco()
-
-elif page == "Fase 5 - Plano de Tratamento de Risco":
-    from app_modules.app_plano_controle import main as plano_controle
-    plano_controle()
-
-elif page == "Fase 7 - Dashboard de Riscos":
-    from app_modules.app_monitoramento import main as monitoramento
-    monitoramento()
-
-elif page == "Gerenciamento de Usuários":
-    from app_modules.app_usuarios import main as usuarios
-    usuarios()
-
-# ─── 7) Rodapé ────────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <footer class="footer">
-      &copy; 2025 SAFEBIS — Todos os direitos reservados
-    </footer>
-    """,
-    unsafe_allow_html=True
-)
+# 8️⃣ RODAPÉ
+st.markdown("""<footer>© 2025 SafeBis – Todos os direitos reservados</footer>""",
+            unsafe_allow_html=True)
