@@ -1,61 +1,75 @@
-/* 1) Importa a Roboto do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap');
-
-/* 2) Global */
+/* ---------------- Global ---------------- */
 body, .stApp {
-  background-color: #0E1117 !important;
-  color: #EFEFEF !important;
-  font-family: 'Roboto', sans-serif !important;
+  background-color: #0A0F1D;       /* tom quase preto */
+  color: #F2F2F2;                  /* texto claro */
+  font-family: 'Roboto', sans-serif;
+  margin: 0; padding: 0;
 }
 
-/* 3) Top-bar personalizada (injetada via Markdown) */
+/*  Top Bar  */
 .top-bar {
-  background-color: #003366;
+  background: #003366;             /* azul escuro Safebis */
   padding: 12px 20px;
-  border-radius: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 1rem;
+}
+.top-bar h2 {
+  color: #FFFFFF;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
-/* 4) Sidebar */
+/*  Sidebar  */
 [data-testid="stSidebar"] {
-  background-color: #003366 !important;
-  padding: 20px 12px !important;
+  background: #002244; /* azul ainda mais escuro */
+  color: #F2F2F2;
+  padding-top: 1rem;
 }
-
-/* 5) Logo na sidebar */
-[data-testid="stSidebar"] img {
+.sidebar-logo-placeholder {
   width: 100%;
+  height: 180px;
+  background: #001530;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
-/* 6) Título “Navegação por Fases” */
-[data-testid="stSidebar"] h2 {
-  color: #FFFFFF !important;
-  margin-top: 0 !important;
-  margin-bottom: 16px !important;
+/*  Títulos  */
+h1, h2, h3, h4, h5 {
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
-/* 7) Cores dos labels de rádio */
-[role="radiogroup"] label {
-  color: #EFEFEF !important;
-}
-
-/* 8) Botões streamlit */
+/*  Botões  */
 .stButton > button {
-  background-color: #4CAF50 !important;
-  color: #FFFFFF !important;
-  border-radius: 6px !important;
-  padding: 10px 20px !important;
-  font-weight: 600 !important;
+  background-color: #0055A5;
+  color: #FFFFFF;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
 }
 .stButton > button:hover {
-  background-color: #43A047 !important;
+  background-color: #0073E6;
 }
 
-/* 9) AG-Grid Dark Theme override */
-.ag-theme-alpine-dark {
-  background-color: #0E1117 !important;
-  color: #EFEFEF !important;
+/*  Radios Selecionados  */
+.stRadio > div > label[aria-checked="true"] {
+  color: #0DAFFF !important;  /* tom claro de destaque */
 }
-/* Certifique-se de que seu AG-Grid use theme="ag-theme-alpine-dark" */
+
+/*  AG-Grid Theme Override  */
+.ag-theme-alpine-dark {
+  background-color: #0A0F1D !important;
+  color: #F2F2F2 !important;
+}
+.ag-theme-alpine-dark .ag-header {
+  background-color: #001530 !important;
+}
+
+/*  Footer  */
+.footer {
+  text-align: center;
+  color: #888888;
+  margin: 2rem 0 1rem;
+  font-size: 0.9rem;
+}

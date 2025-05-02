@@ -1,58 +1,57 @@
-# app.py
 import streamlit as st
 from pathlib import Path
+import os
 
-# 1️⃣ Página config — DEVE vir antes de QUALQUER coisa do Streamlit
+# ─── 1) Configuração de Página ───────────────────────────────────────────────
 st.set_page_config(
-    page_title="SAFEBIS - Sistema de Gestão de Riscos",
+    page_title="SAFEBIS – Sistema de Gestão de Riscos",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2️⃣ Injeção do CSS (assets/style.css)
-css_file = Path(__file__).parent / "assets" / "style.css"
-if css_file.exists():
-    css = css_file.read_text(encoding="utf-8")
+# ─── 2) Injeta o CSS de assets/style.css ────────────────────────────────────
+css_path = Path(__file__).parent / "assets" / "style.css"
+if css_path.exists():
+    css = css_path.read_text(encoding="utf-8")
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 else:
-    st.error("🛑 assets/style.css não encontrado!")
+    st.warning("⚠️ Não encontrei assets/style.css")
 
-# 3️⃣ Sidebar: logo + menu
-with st.sidebar:
-    logo = Path(__file__).parent / "imagens" / "logo.png"
-    if not logo.exists():
-        logo = Path(__file__).parent / "imagens" / "logo.jpg"
-    if logo.exists():
-        st.image(str(logo), use_column_width=True)
-    st.markdown("## Navegação por Fases")
-    page = st.radio(
-        "",
-        [
-            "Tela Inicial - Contexto de Riscos",
-            "Fase 2 - Identificação de Riscos",
-            "Fase 3 - Avaliação de Riscos",
-            "Fase 4 - Resposta ao Risco",
-            "Fase 5 - Plano de Tratamento de Risco",
-            "Fase 7 - Dashboard de Riscos",
-            "Gerenciamento de Usuários"
-        ],
-        index=0
+# ─── 3) Logo na Sidebar ─────────────────────────────────────────────────────
+logo_path = Path(__file__).parent / "imagens" / "logo.jpeg"
+if logo_path.exists():
+    st.sidebar.image(str(logo_path), use_container_width=True)
+else:
+    st.sidebar.markdown(
+        "<div class='sidebar-logo-placeholder'></div>",
+        unsafe_allow_html=True
     )
 
-# 4️⃣ Top-Bar full width
+# ─── 4) Navegação ────────────────────────────────────────────────────────────
+st.sidebar.markdown("## Navegação por Fases")
+page = st.sidebar.radio(
+    "",
+    [
+        "Tela Inicial - Contexto de Riscos",
+        "Fase 2 - Identificação de Riscos",
+        "Fase 3 - Avaliação de Riscos",
+        "Fase 4 - Resposta ao Risco",
+        "Fase 5 - Plano de Tratamento de Risco",
+        "Fase 7 - Dashboard de Riscos",
+        "Gerenciamento de Usuários"
+    ],
+    index=0
+)
+
+# ─── 5) Top Bar ───────────────────────────────────────────────────────────────
 st.markdown(
-    """
-    <div class="top-bar">
-      <h2>SAFEBIS – Sistema de Gestão de Riscos</h2>
-    </div>
-    """,
+    '<div class="top-bar">'
+    '  <h2>SAFEBIS – Sistema de Gestão de Riscos</h2>'
+    '</div>',
     unsafe_allow_html=True
 )
 
-# 5️⃣ Container do conteúdo principal (empurrado pra baixo)
-main = st.container()
-main.markdown('<div class="main-content">', unsafe_allow_html=True)
-
+# ─── 6) Rotas ─────────────────────────────────────────────────────────────────
 if page == "Tela Inicial - Contexto de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
     riscos_dash()
@@ -81,13 +80,11 @@ elif page == "Gerenciamento de Usuários":
     from app_modules.app_usuarios import main as usuarios
     usuarios()
 
-main.markdown("</div>", unsafe_allow_html=True)
-
-# 6️⃣ Rodapé
+# ─── 7) Rodapé ────────────────────────────────────────────────────────────────
 st.markdown(
     """
-    <footer>
-      &copy; 2025 SAFEBIS – Todos os direitos reservados
+    <footer class="footer">
+      &copy; 2025 SAFEBIS — Todos os direitos reservados
     </footer>
     """,
     unsafe_allow_html=True
