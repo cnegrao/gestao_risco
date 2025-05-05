@@ -35,6 +35,7 @@ page = st.sidebar.radio(
     "",
     [
         "Tela Inicial - Contexto de Riscos",
+        "Fase 1 - Estratégia",
         "Fase 2 - Riscos Controle Avaliação",
         "Fase 3 - Identificação de Riscos",
         "Fase 4 - Avaliação de Riscos",
@@ -58,6 +59,9 @@ st.markdown(
 if page == "Tela Inicial - Contexto de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
     riscos_dash()
+elif page == "Fase 1 - Estratégia":
+    from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
+    riscos_estrategia_associacao()
 elif page == "Fase 2 - Riscos Controle Avaliação":
     from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
     riscos_controle_avaliacao()
