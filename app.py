@@ -39,9 +39,8 @@ page = st.sidebar.radio(
         "Fase 2 - Riscos Controle Avaliação",
         "Fase 3 - Identificação de Riscos",
         "Fase 4 - Avaliação de Riscos",
-        "Fase 4 - Resposta ao Risco",
         "Fase 5 - Plano de Tratamento de Risco",
-        "Fase 7 - Dashboard de Riscos",
+        "Fase 5 - Dashboard de Riscos",
         "Gerenciamento de Usuários"
     ],
     index=0
@@ -71,6 +70,9 @@ elif page == "Fase 3 - Identificação de Riscos":
 elif page == "Fase 4 - Avaliação de Riscos":
     from app_modules.riscos_avaliacao import main as riscos_avaliacao
     riscos_avaliacao()
+elif page == "Fase 5 - Plano de Tratamento de Risco":
+    from app_modules.riscos_plano_tratamento import main as riscos_plano_tratamento
+    riscos_plano_tratamento()
 # ... siga para as demais fases
 
 # 8️⃣ RODAPÉ

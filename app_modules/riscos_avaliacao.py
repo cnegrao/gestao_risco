@@ -5,7 +5,6 @@ import os
 import streamlit as st
 import pandas as pd
 from database_utils import run_select, run_query
-# Para matriz de riscos
 import plotly.graph_objs as go
 
 # Ajusta path para módulos
@@ -19,10 +18,12 @@ if parent_dir not in sys.path:
 
 def main_avaliacao():
     st.title("Fase 3 – Avaliação de Riscos")
-    st.markdown("""
-    **Objetivo:** Avaliar os riscos cadastrados preenchendo probabilidade (1-5), impactos em três dimensões,
-    cálculo de impacto final (máximo), nível do risco e classificação (Pequeno, Moderado, Alto, Crítico).
-    """)
+    st.markdown(
+        """
+        **Objetivo:** Avaliar os riscos cadastrados preenchendo probabilidade (1-5), impactos em três dimensões,
+        cálculo de impacto final (máximo), nível do risco e classificação (Pequeno, Moderado, Alto, Crítico).
+        """
+    )
 
     # Riscos disponíveis
     df_riscos = run_select(
@@ -40,7 +41,7 @@ def main_avaliacao():
     id_empresa = int(row['id_empresa'])
     st.markdown("---")
 
-    # Estratégia Associada (somente leitura)
+    # Estratégia Associada
     st.subheader("Estratégia Associada")
     estr_df = run_select(
         """
@@ -48,7 +49,7 @@ def main_avaliacao():
           FROM tb_risco_meta rm
           JOIN tb_meta_estrategica m ON rm.id_meta = m.id_meta
           JOIN tb_objetivo_estrategico o ON m.id_objetivo = o.id_objetivo
-         WHERE rm.id_empresa = %s AND rm.id_risco = %s
+         WHERE rm.id_empresa=%s AND rm.id_risco=%s
          ORDER BY o.id_objetivo, m.id_meta;
         """,
         (id_empresa, id_r)
@@ -58,15 +59,17 @@ def main_avaliacao():
     else:
         st.table(estr_df)
 
-    # Controles Associados (somente leitura)
+    # Controles Associados
     st.subheader("Controles Associados")
     ctrl_df = run_select(
         """
-        SELECT rc.descricao_controle AS Descrição, sc.descricao AS Situação, ec.descricao AS Execução
+        SELECT rc.descricao_controle AS Descrição,
+               sc.descricao AS Situação,
+               ec.descricao AS Execução
           FROM tb_risco_controle rc
-          JOIN tb_situacao_controle sc ON rc.id_situacao_controle = sc.id_situacao_controle
-          JOIN tb_execucao_controle ec ON rc.id_execucao_controle = ec.id_execucao_controle
-         WHERE rc.id_risco = %s
+          JOIN tb_situacao_controle sc ON rc.id_situacao_controle=sc.id_situacao_controle
+          JOIN tb_execucao_controle ec ON rc.id_execucao_controle=ec.id_execucao_controle
+         WHERE rc.id_risco=%s
          ORDER BY rc.data_criacao DESC;
         """,
         (id_r,)
@@ -78,15 +81,15 @@ def main_avaliacao():
 
     st.markdown("---")
 
-    # sliders
-    prob = st.slider("Probabilidade (1 a 5)", 1, 5, 3)
+    # Avaliação
+    prob = st.slider("Probabilidade (1 a 5)", 1, 5, 3, key='aval_prob')
     col1, col2, col3 = st.columns(3)
     with col1:
-        fin = st.slider("Impacto Financeiro", 1, 5, 3)
+        fin = st.slider("Impacto Financeiro", 1, 5, 3, key='aval_fin')
     with col2:
-        img = st.slider("Impacto na Imagem", 1, 5, 3)
+        img = st.slider("Impacto na Imagem", 1, 5, 3, key='aval_img')
     with col3:
-        conf = st.slider("Impacto na Conformidade", 1, 5, 3)
+        conf = st.slider("Impacto na Conformidade", 1, 5, 3, key='aval_conf')
 
     imp_final = max(fin, img, conf)
     nivel = prob * imp_final
@@ -103,8 +106,8 @@ def main_avaliacao():
     st.write(f"**Probabilidade:** {prob}")
     st.write(
         f"**Impactos:** Financeiro={fin}, Imagem={img}, Conformidade={conf}")
-    st.write(f"**Impacto Final:** {imp_final}")
-    st.write(f"**Nível de Risco:** {nivel}")
+    st.write(f"**Impacto Final:** {imp_final} (Fórmula: max(F,I,C))")
+    st.write(f"**Nível de Risco:** {nivel} (Fórmula: {prob}×{imp_final})")
     st.write(f"**Classificação:** {cls}")
 
     if st.button("💾 Salvar Avaliação"):
@@ -145,45 +148,65 @@ def main_avaliacao():
 
     st.markdown("---")
     st.subheader("Matriz de Riscos 5x5")
-    # lógica de heatmap...
-    impact_labels = [str(i) for i in range(1, 6)]
+    # Heatmap
     prob_labels = [str(i) for i in range(1, 6)]
-    z_vals = []
-    text_vals = []
-    for p in range(1, 6):
-        row_z = []
-        row_t = []
-        for i in range(1, 6):
-            v = p*i
-            if v <= 5:
-                c = "Pequeno"
-            elif v <= 10:
-                c = "Moderado"
-            elif v <= 15:
-                c = "Alto"
-            else:
-                c = "Crítico"
-            row_z.append(v)
-            row_t.append(c)
-        z_vals.append(row_z)
-        text_vals.append(row_t)
+    impact_labels = [str(i) for i in range(1, 6)]
+    z = [[(j+1)*(i+1) for j in range(5)] for i in range(5)]
+    z_text = [[str(val) for val in row] for row in z]
+    colorscale = [
+        [0, "green"], [0.2, "green"],
+        [0.21, "yellow"], [0.4, "yellow"],
+        [0.41, "orange"], [0.6, "orange"],
+        [0.61, "red"], [1.0, "red"]
+    ]
     fig = go.Figure(go.Heatmap(
-        x=impact_labels, y=prob_labels[::-
-                                       1], z=z_vals[::-1], text=text_vals[::-1],
-        hovertemplate="Prob=%{y}<br>Imp=%{x}<br>Lvl=%{z}<br>Class=%{text}",
-        colorscale=[[0, "green"], [0.2, "green"], [0.21, "yellow"], [0.4, "yellow"], [
-            0.41, "orange"], [0.6, "orange"], [0.61, "red"], [1.0, "red"]],
-        zmin=1, zmax=25, texttemplate="%{text}", textfont={"size": 14}
+        x=prob_labels,
+        y=impact_labels,
+        z=z,
+        text=z_text,
+        texttemplate="%{text}",
+        hovertemplate="Probabilidade=%{x}<br>Impacto=%{y}<br>Valor=%{z}",
+        colorscale=colorscale,
+        zmin=1,
+        zmax=25,
+        showscale=True
     ))
-    fig.update_layout(title="Matriz de Riscos 5x5", xaxis_title="Impacto",
-                      yaxis_title="Probabilidade", yaxis_autorange="reversed")
+    fig.update_layout(
+        title="Matriz de Riscos 5x5",
+        xaxis_title="Probabilidade",
+        yaxis_title="Impacto",
+        yaxis=dict(autorange="reversed")
+    )
+    # Anota o risco atual
+    fig.add_annotation(
+        x=prob_labels[prob-1],
+        y=impact_labels[imp_final-1],
+        text=str(id_r),
+        showarrow=True,
+        arrowhead=2,
+        ax=0,
+        ay=-20
+    )
     st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("Riscos no gráfico")
+    st.write(f"- **{id_r}**: {escolha}")
+
+    st.markdown("**Legenda de Níveis**")
+    st.write(
+        "- 1–5: Pequeno  \\  \n"
+        "- 6–10: Moderado  \\  \n"
+        "- 11–15: Alto  \\  \n"
+        "- 16–25: Crítico"
+    )
 
 
 def main():
     st.sidebar.title("Navegação")
     page = st.sidebar.radio(
-        "Ir para:", ["Avaliação de Riscos", "Estratégia de Riscos", "Controles de Risco"])
+        "Ir para:",
+        ["Avaliação de Riscos", "Estratégia de Riscos", "Controles de Risco"]
+    )
     if page == "Avaliação de Riscos":
         main_avaliacao()
     elif page == "Estratégia de Riscos":
