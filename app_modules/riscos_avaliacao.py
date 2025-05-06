@@ -1,215 +1,196 @@
+from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
+from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
 import sys
 import os
 import streamlit as st
 import pandas as pd
 from database_utils import run_select, run_query
-
-# Para exibir a matriz de riscos em formato de heatmap (plotly)
+# Para matriz de riscos
 import plotly.graph_objs as go
 
-# ---------------------------------------------
-# Ajuste para encontrar database_utils.py (caso esteja na raiz do projeto)
+# Ajusta path para módulos
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
-# ---------------------------------------------
 
-# st.set_page_config(page_title="Fase 3 - Avaliação de Riscos", layout="wide")
+# Importa telas adicionais
 
 
-def main():
+def main_avaliacao():
     st.title("Fase 3 – Avaliação de Riscos")
     st.markdown("""
-    **Objetivo:** Avaliar os riscos cadastrados na fase anterior, preenchendo:
-    - Probabilidade (1 a 5)
-    - Impactos em três dimensões (Financeiro, Imagem e Conformidade)
-    - Cálculo do impacto final (máximo dos três)
-    - Nível do Risco = probabilidade × impacto_final (1..25)
-    - Classificação do Risco (Pequeno, Moderado, Alto, Crítico)
-
-    As informações serão gravadas nas colunas recém-adicionadas em **tb_riscos**.
+    **Objetivo:** Avaliar os riscos cadastrados preenchendo probabilidade (1-5), impactos em três dimensões,
+    cálculo de impacto final (máximo), nível do risco e classificação (Pequeno, Moderado, Alto, Crítico).
     """)
 
-    # Consulta os riscos cadastrados
-    query_riscos = "SELECT id_risco, nome_risco FROM tb_riscos ORDER BY data_identificacao DESC"
-    df_riscos = run_select(query_riscos)
-
+    # Riscos disponíveis
+    df_riscos = run_select(
+        "SELECT id_risco, nome_risco, id_empresa FROM tb_riscos ORDER BY data_identificacao DESC"
+    )
     if df_riscos.empty:
         st.warning("⚠️ Nenhum risco cadastrado disponível para avaliação.")
         return
 
-    # Selecionar o risco para avaliação
-    risco_selecionado = st.selectbox(
-        "Selecione um Risco para Avaliação", df_riscos["nome_risco"])
-    id_risco = df_riscos.loc[df_riscos["nome_risco"]
-                             == risco_selecionado, "id_risco"].iloc[0]
+    # Seleção de risco
+    escolha = st.selectbox("Selecione um risco:",
+                           df_riscos['nome_risco'], key='aval_risco')
+    row = df_riscos[df_riscos['nome_risco'] == escolha].iloc[0]
+    id_r = int(row['id_risco'])
+    id_empresa = int(row['id_empresa'])
+    st.markdown("---")
 
-    st.subheader("Passo 1: Probabilidade de Ocorrência")
-    probabilidade = st.slider("Probabilidade (1 a 5)",
-                              min_value=1, max_value=5, value=3)
-
-    st.subheader("Passo 2: Avaliação dos Impactos (1 a 5 cada)")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        impacto_financeiro = st.slider("Impacto Financeiro", 1, 5, 3)
-    with col2:
-        impacto_imagem = st.slider("Impacto na Imagem", 1, 5, 3)
-    with col3:
-        impacto_conformidade = st.slider("Impacto na Conformidade", 1, 5, 3)
-
-    # Calcula o impacto final como o máximo entre as três dimensões
-    impacto_final = max(impacto_financeiro, impacto_imagem,
-                        impacto_conformidade)
-    nivel_risco = probabilidade * impacto_final
-
-    # Determina a classificação
-    if 1 <= nivel_risco <= 5:
-        classificacao = "Pequeno"
-    elif 6 <= nivel_risco <= 10:
-        classificacao = "Moderado"
-    elif 11 <= nivel_risco <= 15:
-        classificacao = "Alto"
+    # Estratégia Associada (somente leitura)
+    st.subheader("Estratégia Associada")
+    estr_df = run_select(
+        """
+        SELECT o.descricao AS Objetivo, m.descricao AS Meta
+          FROM tb_risco_meta rm
+          JOIN tb_meta_estrategica m ON rm.id_meta = m.id_meta
+          JOIN tb_objetivo_estrategico o ON m.id_objetivo = o.id_objetivo
+         WHERE rm.id_empresa = %s AND rm.id_risco = %s
+         ORDER BY o.id_objetivo, m.id_meta;
+        """,
+        (id_empresa, id_r)
+    )
+    if estr_df.empty:
+        st.info("Nenhuma estratégia associada a este risco.")
     else:
-        classificacao = "Crítico"
+        st.table(estr_df)
+
+    # Controles Associados (somente leitura)
+    st.subheader("Controles Associados")
+    ctrl_df = run_select(
+        """
+        SELECT rc.descricao_controle AS Descrição, sc.descricao AS Situação, ec.descricao AS Execução
+          FROM tb_risco_controle rc
+          JOIN tb_situacao_controle sc ON rc.id_situacao_controle = sc.id_situacao_controle
+          JOIN tb_execucao_controle ec ON rc.id_execucao_controle = ec.id_execucao_controle
+         WHERE rc.id_risco = %s
+         ORDER BY rc.data_criacao DESC;
+        """,
+        (id_r,)
+    )
+    if ctrl_df.empty:
+        st.info("Nenhum controle associado a este risco.")
+    else:
+        st.table(ctrl_df)
 
     st.markdown("---")
-    st.write(f"**Probabilidade:** {probabilidade}")
-    st.write(
-        f"**Impacto Financeiro:** {impacto_financeiro}, **Imagem:** {impacto_imagem}, **Conformidade:** {impacto_conformidade}")
-    st.write(f"**Impacto Final (máximo):** {impacto_final}")
-    st.write(f"**Nível de Risco:** {nivel_risco}")
-    st.write(f"**Classificação do Risco:** {classificacao}")
 
-    # Botão para salvar no banco
+    # sliders
+    prob = st.slider("Probabilidade (1 a 5)", 1, 5, 3)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        fin = st.slider("Impacto Financeiro", 1, 5, 3)
+    with col2:
+        img = st.slider("Impacto na Imagem", 1, 5, 3)
+    with col3:
+        conf = st.slider("Impacto na Conformidade", 1, 5, 3)
+
+    imp_final = max(fin, img, conf)
+    nivel = prob * imp_final
+    if nivel <= 5:
+        cls = "Pequeno"
+    elif nivel <= 10:
+        cls = "Moderado"
+    elif nivel <= 15:
+        cls = "Alto"
+    else:
+        cls = "Crítico"
+
+    st.markdown("---")
+    st.write(f"**Probabilidade:** {prob}")
+    st.write(
+        f"**Impactos:** Financeiro={fin}, Imagem={img}, Conformidade={conf}")
+    st.write(f"**Impacto Final:** {imp_final}")
+    st.write(f"**Nível de Risco:** {nivel}")
+    st.write(f"**Classificação:** {cls}")
+
     if st.button("💾 Salvar Avaliação"):
         try:
-            update_query = """
-            UPDATE tb_riscos
-               SET probabilidade = %s,
-                   impacto_financeiro = %s,
-                   impacto_imagem = %s,
-                   impacto_conformidade = %s,
-                   impacto_estimado = %s,
-                   nivel_risco = %s,
-                   criticidade = %s
-             WHERE id_risco = %s;
-            """
-            params = (
-                str(probabilidade),
-                str(impacto_financeiro),
-                str(impacto_imagem),
-                str(impacto_conformidade),
-                str(impacto_final),
-                nivel_risco,
-                classificacao,
-                id_risco
+            run_query(
+                """
+                UPDATE tb_riscos
+                   SET probabilidade=%s,
+                       impacto_financeiro=%s,
+                       impacto_imagem=%s,
+                       impacto_conformidade=%s,
+                       impacto_estimado=%s,
+                       nivel_risco=%s,
+                       criticidade=%s
+                 WHERE id_risco=%s;
+                """,
+                (prob, fin, img, conf, imp_final, nivel, cls, id_r)
             )
-            run_query(update_query, params)
             st.success("✅ Avaliação salva com sucesso!")
         except Exception as e:
             st.error(f"❌ Erro ao salvar avaliação: {e}")
 
     st.markdown("---")
     st.subheader("Avaliações Realizadas")
-    query_avaliacoes = """
-        SELECT nome_risco,
-               probabilidade,
-               impacto_financeiro,
-               impacto_imagem,
-               impacto_conformidade,
-               impacto_estimado,
-               nivel_risco,
-               criticidade,
-               data_identificacao
+    df_av = run_select(
+        """
+        SELECT nome_risco, probabilidade, impacto_financeiro, impacto_imagem,
+               impacto_conformidade, impacto_estimado, nivel_risco, criticidade, data_identificacao
           FROM tb_riscos
          WHERE probabilidade IS NOT NULL AND impacto_estimado IS NOT NULL
          ORDER BY data_identificacao DESC;
-    """
-    df_avaliacoes = run_select(query_avaliacoes)
-    if df_avaliacoes is not None and not df_avaliacoes.empty:
-        st.dataframe(df_avaliacoes, use_container_width=True)
+        """
+    )
+    if df_av is not None and not df_av.empty:
+        st.dataframe(df_av, use_container_width=True)
     else:
         st.info("Nenhuma avaliação de risco registrada até o momento.")
 
     st.markdown("---")
-
-    # Opção para exibir a matriz de riscos 5x5 (probabilidade x impacto)
     st.subheader("Matriz de Riscos 5x5")
-
-    st.write("Esta matriz exibe no eixo X o impacto (1..5) e no eixo Y a probabilidade (1..5). "
-             "O produto (probabilidade × impacto) varia de 1 a 25. "
-             "Cores diferentes indicam a classificação (Pequeno, Moderado, Alto, Crítico).")
-
-    # Cria a matriz 5x5 (probabilidade: linhas, impacto: colunas)
-    # Cada célula tem valor = p*i
+    # lógica de heatmap...
+    impact_labels = [str(i) for i in range(1, 6)]
+    prob_labels = [str(i) for i in range(1, 6)]
     z_vals = []
     text_vals = []
     for p in range(1, 6):
         row_z = []
-        row_text = []
+        row_t = []
         for i in range(1, 6):
-            val = p * i
-            # Classificação textual
-            if val <= 5:
-                clas = "Pequeno"
-            elif val <= 10:
-                clas = "Moderado"
-            elif val <= 15:
-                clas = "Alto"
+            v = p*i
+            if v <= 5:
+                c = "Pequeno"
+            elif v <= 10:
+                c = "Moderado"
+            elif v <= 15:
+                c = "Alto"
             else:
-                clas = "Crítico"
-            row_z.append(val)
-            row_text.append(clas)
+                c = "Crítico"
+            row_z.append(v)
+            row_t.append(c)
         z_vals.append(row_z)
-        text_vals.append(row_text)
-
-    # Plotly: Heatmap com 5x5
-    # Eixo x: Impacto 1..5
-    # Eixo y: Probabilidade 1..5
-    # "orientation" - se quisermos prob 1 no topo ou no bottom
-    impact_labels = [str(i) for i in range(1, 6)]
-    prob_labels = [str(i) for i in range(1, 6)]
-
-    # Cores customizadas (pequeno => verde, moderado => amarelo, alto => orange, crítico => red)
-    # Precisamos normalizar 1..25 => range 0..1
-    # e.g: 1 => 0.0, 5 => 0.16, 10 => 0.36, 15 => 0.56, 25 => 1.0
-    custom_colorscale = [
-        [0.0, "green"],     # val = 1
-        [0.2, "green"],
-        [0.21, "yellow"],   # val ~5
-        [0.4, "yellow"],
-        [0.41, "orange"],   # val ~10
-        [0.6, "orange"],
-        [0.61, "red"],      # val ~15
-        [1.0, "red"]        # val ~25
-    ]
-
-    fig = go.Figure(data=go.Heatmap(
-        x=impact_labels,
-        # Reverte y para exibir prob=1 em cima e prob=5 em baixo, se desejado
-        y=prob_labels[::-1],
-        z=z_vals[::-1],       # Aplica a mesma reversão nas linhas
-        text=[row for row in text_vals[::-1]],
-        hovertemplate="Probabilidade=%{y}<br>Impacto=%{x}<br>Nível=%{z}<br>Classificação=%{text}",
-        colorscale=custom_colorscale,
-        zmin=1,
-        zmax=25,
-        showscale=True,
-        texttemplate="%{text}",
-        textfont={"size": 14},
+        text_vals.append(row_t)
+    fig = go.Figure(go.Heatmap(
+        x=impact_labels, y=prob_labels[::-
+                                       1], z=z_vals[::-1], text=text_vals[::-1],
+        hovertemplate="Prob=%{y}<br>Imp=%{x}<br>Lvl=%{z}<br>Class=%{text}",
+        colorscale=[[0, "green"], [0.2, "green"], [0.21, "yellow"], [0.4, "yellow"], [
+            0.41, "orange"], [0.6, "orange"], [0.61, "red"], [1.0, "red"]],
+        zmin=1, zmax=25, texttemplate="%{text}", textfont={"size": 14}
     ))
-
-    # Rótulos e layout
-    fig.update_layout(
-        title="Matriz de Riscos 5x5 (Probabilidade × Impacto)",
-        xaxis=dict(title="Impacto (1 = Baixo, 5 = Muito Alto)"),
-        yaxis=dict(title="Probabilidade (1 = Baixa, 5 = Muito Alta)",
-                   autorange="reversed")
-    )
-
+    fig.update_layout(title="Matriz de Riscos 5x5", xaxis_title="Impacto",
+                      yaxis_title="Probabilidade", yaxis_autorange="reversed")
     st.plotly_chart(fig, use_container_width=True)
 
 
-if __name__ == "__main__":
+def main():
+    st.sidebar.title("Navegação")
+    page = st.sidebar.radio(
+        "Ir para:", ["Avaliação de Riscos", "Estratégia de Riscos", "Controles de Risco"])
+    if page == "Avaliação de Riscos":
+        main_avaliacao()
+    elif page == "Estratégia de Riscos":
+        riscos_estrategia_associacao()
+    else:
+        riscos_controle_avaliacao()
+
+
+if __name__ == '__main__':
     main()

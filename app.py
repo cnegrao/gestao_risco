@@ -65,10 +65,12 @@ elif page == "Fase 1 - Estratégia":
 elif page == "Fase 2 - Riscos Controle Avaliação":
     from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
     riscos_controle_avaliacao()
-
 elif page == "Fase 3 - Identificação de Riscos":
     from app_modules.riscos_identificacao import main as riscos_identificacao
     riscos_identificacao()
+elif page == "Fase 4 - Avaliação de Riscos":
+    from app_modules.riscos_avaliacao import main as riscos_avaliacao
+    riscos_avaliacao()
 # ... siga para as demais fases
 
 # 8️⃣ RODAPÉ
