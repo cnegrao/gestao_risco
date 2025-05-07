@@ -1,5 +1,5 @@
-from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
 from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
+from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
 import sys
 import os
 import streamlit as st
@@ -20,69 +20,65 @@ def main_avaliacao():
     st.title("Fase 3 – Avaliação de Riscos")
     st.markdown(
         """
-        **Objetivo:** Avaliar os riscos cadastrados preenchendo probabilidade (1-5), impactos em três dimensões,
-        cálculo de impacto final (máximo), nível do risco e classificação (Pequeno, Moderado, Alto, Crítico).
+        **Objetivo:** Avaliar os riscos cadastrados preenchendo probabilidade (1-5), impactos em três dimensões, cálculo de impacto final (máximo), nível do risco e classificação.
+        *Use os controles abaixo para definir e salvar sua avaliação.*
         """
     )
 
-    # Riscos disponíveis
+    # Seleção de risco
     df_riscos = run_select(
         "SELECT id_risco, nome_risco, id_empresa FROM tb_riscos ORDER BY data_identificacao DESC"
     )
     if df_riscos.empty:
-        st.warning("⚠️ Nenhum risco cadastrado disponível para avaliação.")
+        st.warning("⚠️ Nenhum risco cadastrado disponível.")
         return
 
-    # Seleção de risco
     escolha = st.selectbox("Selecione um risco:",
                            df_riscos['nome_risco'], key='aval_risco')
-    row = df_riscos[df_riscos['nome_risco'] == escolha].iloc[0]
-    id_r = int(row['id_risco'])
-    id_empresa = int(row['id_empresa'])
+    sel_row = df_riscos[df_riscos['nome_risco'] == escolha].iloc[0]
+    id_r = int(sel_row['id_risco'])
+    id_empresa = int(sel_row['id_empresa'])
     st.markdown("---")
 
-    # Estratégia Associada
-    st.subheader("Estratégia Associada")
-    estr_df = run_select(
-        """
-        SELECT o.descricao AS Objetivo, m.descricao AS Meta
-          FROM tb_risco_meta rm
-          JOIN tb_meta_estrategica m ON rm.id_meta = m.id_meta
-          JOIN tb_objetivo_estrategico o ON m.id_objetivo = o.id_objetivo
-         WHERE rm.id_empresa=%s AND rm.id_risco=%s
-         ORDER BY o.id_objetivo, m.id_meta;
-        """,
-        (id_empresa, id_r)
-    )
-    if estr_df.empty:
-        st.info("Nenhuma estratégia associada a este risco.")
-    else:
-        st.table(estr_df)
-
-    # Controles Associados
-    st.subheader("Controles Associados")
-    ctrl_df = run_select(
-        """
-        SELECT rc.descricao_controle AS Descrição,
-               sc.descricao AS Situação,
-               ec.descricao AS Execução
-          FROM tb_risco_controle rc
-          JOIN tb_situacao_controle sc ON rc.id_situacao_controle=sc.id_situacao_controle
-          JOIN tb_execucao_controle ec ON rc.id_execucao_controle=ec.id_execucao_controle
-         WHERE rc.id_risco=%s
-         ORDER BY rc.data_criacao DESC;
-        """,
-        (id_r,)
-    )
-    if ctrl_df.empty:
-        st.info("Nenhum controle associado a este risco.")
-    else:
-        st.table(ctrl_df)
+    # Exibe contexto: Estratégia & Controles
+    colE, colC = st.columns(2)
+    with colE:
+        st.subheader("Estratégia Associada")
+        estr_df = run_select(
+            """
+            SELECT o.descricao AS Objetivo, m.descricao AS Meta
+              FROM tb_risco_meta rm
+              JOIN tb_meta_estrategica m ON rm.id_meta = m.id_meta
+              JOIN tb_objetivo_estrategico o ON m.id_objetivo = o.id_objetivo
+             WHERE rm.id_empresa=%s AND rm.id_risco=%s;
+            """, (id_empresa, id_r)
+        )
+        if estr_df.empty:
+            st.info("Nenhuma estratégia associada.")
+        else:
+            st.table(estr_df)
+    with colC:
+        st.subheader("Controles Associados")
+        ctrl_df = run_select(
+            """
+            SELECT rc.descricao_controle AS Descrição,
+                   sc.descricao AS Situação,
+                   ec.descricao AS Execução
+              FROM tb_risco_controle rc
+              JOIN tb_situacao_controle sc ON rc.id_situacao_controle=sc.id_situacao_controle
+              JOIN tb_execucao_controle ec ON rc.id_execucao_controle=ec.id_execucao_controle
+             WHERE rc.id_risco=%s;
+            """, (id_r,)
+        )
+        if ctrl_df.empty:
+            st.info("Nenhum controle associado.")
+        else:
+            st.table(ctrl_df)
 
     st.markdown("---")
-
-    # Avaliação
-    prob = st.slider("Probabilidade (1 a 5)", 1, 5, 3, key='aval_prob')
+    # Sliders de avaliação
+    st.subheader("Defina sua Avaliação")
+    prob = st.slider("Probabilidade", 1, 5, 3, key='aval_prob')
     col1, col2, col3 = st.columns(3)
     with col1:
         fin = st.slider("Impacto Financeiro", 1, 5, 3, key='aval_fin')
@@ -93,23 +89,19 @@ def main_avaliacao():
 
     imp_final = max(fin, img, conf)
     nivel = prob * imp_final
-    if nivel <= 5:
-        cls = "Pequeno"
-    elif nivel <= 10:
-        cls = "Moderado"
-    elif nivel <= 15:
-        cls = "Alto"
-    else:
-        cls = "Crítico"
+    cls = (
+        "Pequeno" if nivel <= 5 else
+        "Moderado" if nivel <= 10 else
+        "Alto" if nivel <= 15 else
+        "Crítico"
+    )
 
-    st.markdown("---")
-    st.write(f"**Probabilidade:** {prob}")
-    st.write(
-        f"**Impactos:** Financeiro={fin}, Imagem={img}, Conformidade={conf}")
-    st.write(f"**Impacto Final:** {imp_final} (Fórmula: max(F,I,C))")
-    st.write(f"**Nível de Risco:** {nivel} (Fórmula: {prob}×{imp_final})")
-    st.write(f"**Classificação:** {cls}")
+    # Mapas de cor e ícones para classificação
+    icon_map = {"Pequeno": "🟢", "Moderado": "🟡", "Alto": "🟠", "Crítico": "🔴"}
+    color_map = {"Pequeno": "#00FF00", "Moderado": "#FFFF00",
+                 "Alto": "#FFA500", "Crítico": "#FF0000"}
 
+    # Botão de salvar
     if st.button("💾 Salvar Avaliação"):
         try:
             run_query(
@@ -130,86 +122,84 @@ def main_avaliacao():
         except Exception as e:
             st.error(f"❌ Erro ao salvar avaliação: {e}")
 
-    st.markdown("---")
-    st.subheader("Avaliações Realizadas")
-    df_av = run_select(
-        """
-        SELECT nome_risco, probabilidade, impacto_financeiro, impacto_imagem,
-               impacto_conformidade, impacto_estimado, nivel_risco, criticidade, data_identificacao
-          FROM tb_riscos
-         WHERE probabilidade IS NOT NULL AND impacto_estimado IS NOT NULL
-         ORDER BY data_identificacao DESC;
-        """
-    )
-    if df_av is not None and not df_av.empty:
-        st.dataframe(df_av, use_container_width=True)
-    else:
-        st.info("Nenhuma avaliação de risco registrada até o momento.")
+    # Container estilizado para resultados
+    st.markdown(f"""
+    <div style="background-color:#1f2b3a;padding:20px;border-radius:8px;border:1px solid #334455;margin-bottom:20px;">
+      <h3 style="margin:0 0 12px;color:#fff;">Resultado da Avaliação</h3>
+      <div style="display:flex;justify-content:space-evenly;">
+        <div style="text-align:center;">
+          <div style="font-size:14px;color:#aaa;">Probabilidade</div>
+          <div style="font-size:32px;font-weight:bold;color:{color_map.get(cls)};">{prob}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:14px;color:#aaa;">Impacto Final</div>
+          <div style="font-size:32px;font-weight:bold;color:{color_map.get(cls)};">{imp_final}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:14px;color:#aaa;">Nível de Risco</div>
+          <div style="font-size:32px;font-weight:bold;color:{color_map.get(cls)};">{nivel}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:14px;color:#aaa;">Classificação</div>
+          <div style="font-size:32px;font-weight:bold;color:{color_map.get(cls)};">{icon_map.get(cls)} {cls}</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.subheader("Matriz de Riscos 5x5")
-    # Heatmap
-    prob_labels = [str(i) for i in range(1, 6)]
-    impact_labels = [str(i) for i in range(1, 6)]
-    z = [[(j+1)*(i+1) for j in range(5)] for i in range(5)]
-    z_text = [[str(val) for val in row] for row in z]
-    colorscale = [
-        [0, "green"], [0.2, "green"],
-        [0.21, "yellow"], [0.4, "yellow"],
-        [0.41, "orange"], [0.6, "orange"],
-        [0.61, "red"], [1.0, "red"]
-    ]
+    # Monta matriz de contagem filtrada por processo
+    proc_df = run_select(
+        "SELECT sp.id_processo FROM tb_riscos r JOIN tb_subprocessos sp ON r.id_subprocesso=sp.id_subprocesso WHERE r.id_risco=%s;", (
+            id_r,)
+    )
+    if proc_df.empty:
+        st.error("⚠️ Processo não encontrado.")
+        return
+    pid = int(proc_df.iloc[0, 0])
+    all_df = run_select(
+        "SELECT r.probabilidade, GREATEST(r.impacto_financeiro, r.impacto_imagem, r.impacto_conformidade) AS impacto_final FROM tb_riscos r JOIN tb_subprocessos sp ON r.id_subprocesso=sp.id_subprocesso WHERE sp.id_processo=%s AND r.probabilidade IS NOT NULL;", (pid,)
+    )
+    z = [[0]*5 for _ in range(5)]
+    for _, r in all_df.iterrows():
+        try:
+            p = int(r.probabilidade) - 1
+            i = int(r.impacto_final) - 1
+        except:
+            continue
+        if 0 <= p < 5 and 0 <= i < 5:
+            z[4-i][p] += 1
+    prob_labels = [str(x) for x in range(1, 6)]
+    y_labels = [str(x) for x in range(5, 0, -1)]
     fig = go.Figure(go.Heatmap(
         x=prob_labels,
-        y=impact_labels,
+        y=y_labels,
         z=z,
-        text=z_text,
+        text=z,
         texttemplate="%{text}",
-        hovertemplate="Probabilidade=%{x}<br>Impacto=%{y}<br>Valor=%{z}",
-        colorscale=colorscale,
-        zmin=1,
-        zmax=25,
+        hovertemplate="Prob=%{x} Impacto=%{y}<br>Riscos=%{z}",
+        colorscale="Reds",
+        zmin=0,
+        zmax=max(max(row) for row in z),
         showscale=True
     ))
     fig.update_layout(
-        title="Matriz de Riscos 5x5",
+        title="Matriz de Riscos por Quadrante (Contagem)",
         xaxis_title="Probabilidade",
         yaxis_title="Impacto",
-        yaxis=dict(autorange="reversed")
+        yaxis=dict(autorange=False)
     )
-    # Anota o risco atual
-    fig.add_annotation(
-        x=prob_labels[prob-1],
-        y=impact_labels[imp_final-1],
-        text=str(id_r),
-        showarrow=True,
-        arrowhead=2,
-        ax=0,
-        ay=-20
-    )
+    st.subheader("Distribuição de Riscos no Processo")
     st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("Riscos no gráfico")
-    st.write(f"- **{id_r}**: {escolha}")
-
-    st.markdown("**Legenda de Níveis**")
-    st.write(
-        "- 1–5: Pequeno  \\  \n"
-        "- 6–10: Moderado  \\  \n"
-        "- 11–15: Alto  \\  \n"
-        "- 16–25: Crítico"
-    )
 
 
 def main():
     st.sidebar.title("Navegação")
-    page = st.sidebar.radio(
-        "Ir para:",
-        ["Avaliação de Riscos", "Estratégia de Riscos", "Controles de Risco"]
-    )
-    if page == "Avaliação de Riscos":
+    escolha = st.sidebar.radio(
+        "Ir para:", ["Avaliação de Riscos", "Estratégia de Riscos", "Controles de Risco"])
+    if escolha == "Avaliação de Riscos":
         main_avaliacao()
-    elif page == "Estratégia de Riscos":
+    elif escolha == "Estratégia de Riscos":
         riscos_estrategia_associacao()
     else:
         riscos_controle_avaliacao()
