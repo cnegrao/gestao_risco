@@ -1,7 +1,3 @@
-[DATABASE]
-URL = "postgresql://postgres:admindb@db.mvdpxnnsjyaovhqsyvzd.supabase.co:5432/postgres"
-
-
 [theme]
 # Tom de fundo geral do app
 backgroundColor = "#0F1B2A"
