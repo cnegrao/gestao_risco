@@ -59,9 +59,6 @@ def db_connection():
     """
     cfg = load_db_config()
 
-    if st and not platform.system().lower().startswith("win"):
-        st.write("Database config:", cfg)
-
     if "dsn" in cfg:
         conn = psycopg2.connect(cfg["dsn"])
     else:
