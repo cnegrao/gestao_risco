@@ -15,6 +15,9 @@ except ImportError:
 BASE_DIR = Path(__file__).parent.resolve()
 INI_PATH = BASE_DIR / "config" / "config.ini"
 
+if st and not platform.system().lower().startswith("win"):
+    st.write("Database config:", cfg)
+
 
 def load_db_config():
     """
