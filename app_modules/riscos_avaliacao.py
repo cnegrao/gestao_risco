@@ -1,11 +1,14 @@
-from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
-from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
-import sys
 import os
-import streamlit as st
+import sys
+
 import pandas as pd
-from database_utils import run_select, run_query
 import plotly.graph_objs as go
+import streamlit as st
+
+from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
+from app_modules.riscos_estrategia_associacao import \
+    riscos_estrategia_associacao
+from database_utils import run_query, run_select
 
 # Ajusta path para módulos
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +30,7 @@ def main_avaliacao():
 
     # Seleção de risco
     df_riscos = run_select(
-        "SELECT id_risco, nome_risco, id_empresa FROM tb_riscos ORDER BY data_identificacao DESC"
+        "SELECT id_risco, nome_risco, id_empresa FROM tb_riscos ORDER BY nome_risco DESC"
     )
     if df_riscos.empty:
         st.warning("⚠️ Nenhum risco cadastrado disponível.")
