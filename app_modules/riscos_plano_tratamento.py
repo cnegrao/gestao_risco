@@ -1,9 +1,12 @@
-import streamlit as st
-import pandas as pd
-from pathlib import Path
-from database_utils import run_select, run_query
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 import datetime
+from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+from st_aggrid import (AgGrid, DataReturnMode, GridOptionsBuilder,
+                       GridUpdateMode)
+
+from database_utils import run_query, run_select
 
 
 def riscos_plano_tratamento():
