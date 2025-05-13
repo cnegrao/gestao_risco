@@ -151,53 +151,51 @@ def main():
 
     with t2:
         # ------------------ Heatmap de Avaliações ------------------
-        st.subheader("Matriz de Risco: Probabilidade × Impacto (Avaliações)")
+        # ------------------ Heatmap de Avaliações ------------------
+        st.subheader("Matriz de Avaliações (Prob × Impacto)")
 
-        # 1) Busca diretamente as avaliações
+        # 1) Busca as avaliações, trazendo id_risco para deduplicar
         q_heat = """
-            SELECT 
-            probabilidade,
-            impacto_final,
-            criticidade
-            FROM public.tb_risco_avaliacoes
-            WHERE probabilidade IS NOT NULL
-            AND criticidade IN ('Pequeno','Moderado','Alto');
-            """
+        SELECT 
+        id_risco,
+        probabilidade,
+        impacto_final,
+        criticidade
+        FROM public.tb_risco_avaliacoes
+        WHERE criticidade IN ('Risco Baixo','Risco Médio','Risco Alto');
+        """
         heat_df = run_select(q_heat)
 
-        # 2) Mapeia criticidade para valor [0,1,2]
-        crit_map = {'Pequeno': 0, 'Moderado': 1, 'Alto': 2}
+        # 2) Mapeia criticidade para valor 0=Pequeno,1=Médio,2=Alto
+        crit_map = {'Risco Baixo': 0, 'Risco Médio': 1, 'Risco Alto': 2}
         heat_df['crit_val'] = heat_df['criticidade'].map(crit_map)
 
-        # 3) Para cada par (p,i) contamos:
-        #    - o número de avaliações (para o texto da célula)
-        #    - a pior criticidade (para a cor)
-        count_df = (
+        # 3) Agrupa, contando riscos distintos e determinando pior criticidade
+        agg = (
             heat_df
             .groupby(['probabilidade', 'impacto_final'])
             .agg(
-                qtd=('criticidade', 'size'),
+                qtd_riscos=('id_risco', 'nunique'),
                 crit_max=('crit_val', 'max')
             )
             .reset_index()
         )
 
-        # 4) Monta a matriz 5×5
+        # 4) Monta matrizes 5×5 para quantidade e criticidade
         z_count = [[0]*5 for _ in range(5)]
         z_crit = [[0]*5 for _ in range(5)]
-        for _, row in count_df.iterrows():
-            p = int(row['probabilidade'])-1
-            i = int(row['impacto_final'])-1
-            # invertendo y para impacto=1 na base e 5 no topo
+        for _, row in agg.iterrows():
+            p = int(row['probabilidade']) - 1
+            i = int(row['impacto_final']) - 1
             linha = 4 - i
-            z_count[linha][p] = int(row['qtd'])
+            z_count[linha][p] = int(row['qtd_riscos'])
             z_crit[linha][p] = int(row['crit_max'])
 
-        # 5) Definição do colorscale discreto
+        # 5) Discretiza cores em três intervalos
         colorscale = [
-            [0.0, 'green'],  [0.33, 'green'],
-            [0.34, 'orange'], [0.66, 'orange'],
-            [0.67, 'red'],   [1.0, 'red']
+            [0.0,  'green'],   [0.33, 'green'],
+            [0.34, 'orange'],  [0.66, 'orange'],
+            [0.67, 'red'],     [1.0,  'red'],
         ]
 
         fig_heat = go.Figure(
@@ -211,23 +209,25 @@ def main():
                     title="Criticidade",
                     tickmode="array",
                     tickvals=[0, 1, 2],
-                    ticktext=["Pequeno", "Moderado", "Alto"]
+                    ticktext=["Baixo", "Médio", "Alto"]
                 ),
                 text=z_count,
                 texttemplate="%{text}",
                 hovertemplate=(
-                    "Probabilidade %{x}<br>"
-                    "Impacto %{y}<br>"
-                    "Avaliações %{text}<br>"
-                    "Criticidade %{colorbar.title}<extra></extra>"
+                    "Probabilidade: %{x}<br>"
+                    "Impacto: %{y}<br>"
+                    "Riscos: %{text}<extra></extra>"
                 )
             )
         )
+
         fig_heat.update_layout(
             title="Matriz de Avaliações (Prob × Impacto)",
             xaxis_title="Probabilidade",
-            yaxis_title="Impacto"
+            yaxis_title="Impacto",
+            margin=dict(t=50, l=50, r=20, b=50)
         )
+
         st.plotly_chart(fig_heat, use_container_width=True)
 
 
