@@ -1,6 +1,6 @@
-import streamlit as st
 import pandas as pd
-from database_utils import run_select, run_query
+import streamlit as st
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Plano de Controle", layout="wide")
@@ -16,16 +16,14 @@ if df_riscos.empty:
     st.warning("⚠️ Nenhum risco disponível para planejamento de controle.")
 else:
     risco_selecionado = st.selectbox(
-        "Selecione um Risco para Definir Ações de Controle", df_riscos["nome_risco"])
-    id_risco = df_riscos[df_riscos["nome_risco"]
-                         == risco_selecionado]["id_risco"].values[0]
+        "Selecione um Risco para Definir Ações de Controle", df_riscos["nome_risco"]
+    )
+    id_risco = df_riscos[df_riscos["nome_risco"] == risco_selecionado]["id_risco"].values[0]
 
     descricao_acao = st.text_area("Descrição da Ação de Controle")
     responsavel = st.text_input("Responsável pela Execução")
-    prazo_execucao = st.date_input(
-        "Prazo para Execução", min_value=pd.to_datetime("today").date())
-    custo_estimado = st.number_input(
-        "Custo Estimado (R$)", min_value=0.0, format="%.2f")
+    prazo_execucao = st.date_input("Prazo para Execução", min_value=pd.to_datetime("today").date())
+    custo_estimado = st.number_input("Custo Estimado (R$)", min_value=0.0, format="%.2f")
     beneficio_estimado = st.text_area("Benefício Esperado")
 
     if st.button("💾 Salvar Plano de Controle"):
@@ -33,8 +31,17 @@ else:
         INSERT INTO planos_acao (id_risco, descricao_plano, responsavel, prazo_execucao, custo_estimado, beneficio_estimado, status)
         VALUES (%s, %s, %s, %s, %s, %s, 'Pendente')
         """
-        run_query(query, (id_risco, descricao_acao, responsavel,
-                  prazo_execucao, custo_estimado, beneficio_estimado))
+        run_query(
+            query,
+            (
+                id_risco,
+                descricao_acao,
+                responsavel,
+                prazo_execucao,
+                custo_estimado,
+                beneficio_estimado,
+            ),
+        )
         st.success("✅ Plano de Controle registrado com sucesso!")
 
 # ---------------------- Exibição dos Planos de Controle ----------------------

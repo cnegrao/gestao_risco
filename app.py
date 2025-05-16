@@ -1,12 +1,12 @@
 from pathlib import Path
-import streamlit as st
 
+import streamlit as st
 
 # 1️⃣ CONFIGURAÇÃO DE PÁGINA (sempre em primeiríssima linha após imports)
 st.set_page_config(
     page_title="SAFEBIS – SISTEMA DE GESTÃO DE RISCOS",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # 2️⃣ INJEÇÃO DO CSS
@@ -22,10 +22,7 @@ logo_path = Path(__file__).parent / "imagens" / "logo.jpeg"
 if logo_path.exists():
     st.sidebar.image(str(logo_path), use_container_width=True)
 else:
-    st.sidebar.markdown(
-        "<div class='sidebar-logo-placeholder'></div>",
-        unsafe_allow_html=True
-    )
+    st.sidebar.markdown("<div class='sidebar-logo-placeholder'></div>", unsafe_allow_html=True)
 
 # 4️⃣ TÍTULO DA SIDEBAR
 st.sidebar.markdown("# Navegação por Fases")
@@ -41,43 +38,50 @@ page = st.sidebar.radio(
         "Fase 4 - Avaliação de Riscos",
         "Fase 5 - Plano de Tratamento de Risco",
         "Fase 6 - Dashboard de Riscos",
-        "Gerenciamento de Usuários"
+        "Gerenciamento de Usuários",
     ],
-    index=0
+    index=0,
 )
 
 # 6️⃣ BARRA SUPERIOR FIXA
 st.markdown(
-    '<div class="top-bar">'
-    '<h1>SAFEBIS – SISTEMA DE GESTÃO DE RISCOS</h1>'
-    '</div>',
-    unsafe_allow_html=True
+    '<div class="top-bar">' "<h1>SAFEBIS – SISTEMA DE GESTÃO DE RISCOS</h1>" "</div>",
+    unsafe_allow_html=True,
 )
 
 # 7️⃣ CHAMADA DAS PÁGINAS
 if page == "Tela Inicial - Contexto de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
+
     riscos_dash()
 elif page == "Fase 1 - Estratégia":
     from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
+
     riscos_estrategia_associacao()
 elif page == "Fase 2 - Riscos Controle Avaliação":
     from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
+
     riscos_controle_avaliacao()
 elif page == "Fase 3 - Identificação de Riscos":
     from app_modules.riscos_identificacao import main as riscos_identificacao
+
     riscos_identificacao()
 elif page == "Fase 4 - Avaliação de Riscos":
     from app_modules.riscos_avaliacao import main as riscos_avaliacao
+
     riscos_avaliacao()
 elif page == "Fase 5 - Plano de Tratamento de Risco":
     from app_modules.riscos_plano_tratamento import main as riscos_plano_tratamento
+
     riscos_plano_tratamento()
 elif page == "Fase 6 - Dashboard de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
+
     riscos_dash()
 # ... siga para as demais fases
 
 # 8️⃣ RODAPÉ
-st.markdown("""<footer>© 2025 SafeBis – Todos os direitos reservados</footer>""",
-            unsafe_allow_html=True)
+st.markdown(
+    """<footer>© 2025 SafeBis – Todos os direitos reservados</footer>""",
+    unsafe_allow_html=True,
+)

@@ -1,6 +1,5 @@
 import streamlit as st
-import pandas as pd
-from database_utils import run_select, run_query
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Resposta ao Risco", layout="wide")
@@ -15,13 +14,12 @@ df_riscos = run_select(query_riscos)
 if df_riscos.empty:
     st.warning("⚠️ Nenhum risco avaliado disponível para resposta.")
 else:
-    risco_selecionado = st.selectbox(
-        "Selecione um Risco para Resposta", df_riscos["nome_risco"])
-    id_risco = df_riscos[df_riscos["nome_risco"]
-                         == risco_selecionado]["id_risco"].values[0]
+    risco_selecionado = st.selectbox("Selecione um Risco para Resposta", df_riscos["nome_risco"])
+    id_risco = df_riscos[df_riscos["nome_risco"] == risco_selecionado]["id_risco"].values[0]
 
-    estrategia = st.selectbox("Estratégia de Resposta", [
-                              "Evitar", "Reduzir", "Compartilhar", "Aceitar"])
+    estrategia = st.selectbox(
+        "Estratégia de Resposta", ["Evitar", "Reduzir", "Compartilhar", "Aceitar"]
+    )
     justificativa = st.text_area("Justificativa para a escolha da estratégia")
 
     if st.button("💾 Salvar Resposta ao Risco"):

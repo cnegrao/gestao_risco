@@ -1,7 +1,8 @@
+import io
+
+import pandas as pd
 import streamlit as st
 from database_utils import run_select
-import pandas as pd
-import io
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Gestão de Riscos - Usuários", layout="wide")
@@ -21,7 +22,7 @@ def main():
     def gerar_excel(df, sheet_name="Usuarios"):
         """Gera um arquivo Excel com os dados fornecidos."""
         output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
             df.to_excel(writer, index=False, sheet_name=sheet_name)
         output.seek(0)
         return output
@@ -31,11 +32,11 @@ def main():
 
     # 🔹 Seleção de Tipo de Usuário
     tipo_usuario = st.sidebar.selectbox(
-        "Tipo de Usuário", ["Todos", "Analista", "Gestor", "Administrador"])
+        "Tipo de Usuário", ["Todos", "Analista", "Gestor", "Administrador"]
+    )
 
     # 🔹 Filtro de Status do Usuário
-    status_usuario = st.sidebar.selectbox(
-        "Status do Usuário", ["Ativo", "Inativo"])
+    status_usuario = st.sidebar.selectbox("Status do Usuário", ["Ativo", "Inativo"])
 
     # 🔹 Botão para Buscar Dados
     if st.sidebar.button("🔍 Buscar Usuários"):
@@ -48,8 +49,7 @@ def main():
         df_usuarios = consultar_dados(query)
 
         if df_usuarios.empty:
-            st.warning(
-                "⚠️ Nenhum usuário encontrado para os filtros selecionados.")
+            st.warning("⚠️ Nenhum usuário encontrado para os filtros selecionados.")
         else:
             st.subheader("📋 Usuários Cadastrados")
             st.dataframe(df_usuarios, use_container_width=True)
@@ -60,7 +60,7 @@ def main():
                 label="📥 Baixar Relatório Excel",
                 data=excel_file,
                 file_name="Relatorio_Usuarios.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
 
 

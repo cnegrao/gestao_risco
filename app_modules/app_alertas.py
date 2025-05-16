@@ -1,9 +1,8 @@
-import streamlit as st
-from database_utils import run_select
-import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 
+import streamlit as st
+from database_utils import run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Gestão de Riscos - Alertas", layout="wide")
@@ -35,10 +34,8 @@ def main():
     st.subheader("📢 Configuração de Notificações")
 
     email_alerta = st.text_input("📧 Email para receber alertas")
-    tipo_alerta = st.selectbox(
-        "Tipo de Alerta", ["Todos", "Críticos", "Encerrados"])
-    frequencia_alerta = st.selectbox("Frequência de Notificação", [
-                                     "Imediato", "Diário", "Semanal"])
+    tipo_alerta = st.selectbox("Tipo de Alerta", ["Todos", "Críticos", "Encerrados"])
+    frequencia_alerta = st.selectbox("Frequência de Notificação", ["Imediato", "Diário", "Semanal"])
 
     # Função para envio de email
     def enviar_email(destinatario, assunto, mensagem):
@@ -46,9 +43,9 @@ def main():
         senha = "sua_senha"  # Configurar senha do email
 
         msg = MIMEText(mensagem)
-        msg['Subject'] = assunto
-        msg['From'] = remetente
-        msg['To'] = destinatario
+        msg["Subject"] = assunto
+        msg["From"] = remetente
+        msg["To"] = destinatario
 
         try:
             with smtplib.SMTP_SSL("smtp.example.com", 465) as server:
@@ -59,8 +56,7 @@ def main():
             st.error(f"❌ Erro ao enviar email: {e}")
 
     if st.button("💾 Salvar Configuração"):
-        st.success(
-            "✅ Configuração salva! Você receberá alertas no email informado.")
+        st.success("✅ Configuração salva! Você receberá alertas no email informado.")
 
         # Simulação de envio de alerta por email
         if email_alerta:

@@ -1,6 +1,6 @@
-import streamlit as st
 import pandas as pd
-from database_utils import run_select, run_query
+import streamlit as st
+from database_utils import run_query, run_select
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 
 
@@ -22,7 +22,7 @@ def main():
         search_query = st.text_input(
             "Digite sua consulta:",
             value=st.session_state.search_query,
-            key="input_search_query"
+            key="input_search_query",
         )
         submit_search = st.form_submit_button("🔍 Buscar Riscos")
         if submit_search:
@@ -71,15 +71,19 @@ def main():
         else:
             st.write("Selecione os riscos desejados:")
             gb = GridOptionsBuilder.from_dataframe(df_riscos)
-            gb.configure_selection("multiple", use_checkbox=True,
-                                   groupSelectsChildren=True, suppressRowClickSelection=False)
+            gb.configure_selection(
+                "multiple",
+                use_checkbox=True,
+                groupSelectsChildren=True,
+                suppressRowClickSelection=False,
+            )
             grid_options = gb.build()
             grid_response = AgGrid(
                 df_riscos,
                 gridOptions=grid_options,
                 update_mode=GridUpdateMode.SELECTION_CHANGED,
                 height=300,
-                fit_columns_on_grid_load=True
+                fit_columns_on_grid_load=True,
             )
 
             # Verifica se "selected_rows" é um DataFrame e converte para lista de dicionários, se necessário
@@ -97,22 +101,17 @@ def main():
                     if risk_id is not None and company_id is not None:
                         selected_ids.append((risk_id, company_id))
                     else:
-                        st.error(
-                            f"Chave 'id_risco' ou 'id_empresa' não encontrada na linha: {row}")
+                        st.error(f"Chave 'id_risco' ou 'id_empresa' não encontrada na linha: {row}")
                 else:
                     st.error(f"Tipo inesperado: {type(row)} - {row}")
 
-            st.write(
-                "IDs dos riscos selecionados (id_risco, id_empresa):", selected_ids)
+            st.write("IDs dos riscos selecionados (id_risco, id_empresa):", selected_ids)
 
             # Formulário para salvar os riscos selecionados
             with st.form(key="save_selected_form"):
-                usuario = st.text_input(
-                    "Usuário", value="usuario_padrão", key="input_usuario")
-                observacoes = st.text_area(
-                    "Observações (opcional)", key="input_observacoes")
-                submit_save = st.form_submit_button(
-                    "💾 Salvar Riscos Selecionados")
+                usuario = st.text_input("Usuário", value="usuario_padrão", key="input_usuario")
+                observacoes = st.text_area("Observações (opcional)", key="input_observacoes")
+                submit_save = st.form_submit_button("💾 Salvar Riscos Selecionados")
                 if submit_save:
                     # Cria a tabela de associação, se ainda não existir
                     create_table_query = """
@@ -134,15 +133,17 @@ def main():
                         INSERT INTO tb_risco_selecionado (id_empresa, id_risco, usuario, observacoes)
                         VALUES (%s, %s, %s, %s);
                         """
-                        params_insert = (company_id, risk_id,
-                                         usuario, observacoes)
+                        params_insert = (company_id, risk_id, usuario, observacoes)
                         run_query(insert_query, params_insert)
                         count += 1
                     st.success(
-                        f"{count} risco(s) selecionado(s) e associados à empresa com sucesso!")
+                        f"{count} risco(s) selecionado(s) e associados à empresa com sucesso!"
+                    )
 
     st.markdown("---")
-    st.write("Utilize esta ferramenta para buscar e associar riscos à sua empresa de forma inteligente (POC).")
+    st.write(
+        "Utilize esta ferramenta para buscar e associar riscos à sua empresa de forma inteligente (POC)."
+    )
 
 
 if __name__ == "__main__":

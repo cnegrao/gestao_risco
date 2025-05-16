@@ -1,7 +1,7 @@
-import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from database_utils import run_select, run_query
+import streamlit as st
+from database_utils import run_query, run_select
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 
 
@@ -30,7 +30,7 @@ def main():
         search_query = st.text_input(
             "Digite sua consulta:",
             value=st.session_state.search_query,
-            key="input_search_query"
+            key="input_search_query",
         )
         submit_search = st.form_submit_button("🔍 Buscar Riscos")
         if submit_search:
@@ -66,8 +66,7 @@ def main():
                    OR p.nome_processo ILIKE %s
                 ORDER BY r.data_identificacao DESC;
                 """
-                params = (like_query, like_query,
-                          like_query, like_query, like_query)
+                params = (like_query, like_query, like_query, like_query, like_query)
                 df = run_select(query, params)
                 st.session_state.df_riscos = df
             else:
@@ -81,15 +80,19 @@ def main():
         else:
             st.write("Selecione os riscos desejados:")
             gb = GridOptionsBuilder.from_dataframe(df_riscos)
-            gb.configure_selection("multiple", use_checkbox=True,
-                                   groupSelectsChildren=True, suppressRowClickSelection=False)
+            gb.configure_selection(
+                "multiple",
+                use_checkbox=True,
+                groupSelectsChildren=True,
+                suppressRowClickSelection=False,
+            )
             grid_options = gb.build()
             grid_response = AgGrid(
                 df_riscos,
                 gridOptions=grid_options,
                 update_mode=GridUpdateMode.SELECTION_CHANGED,
                 height=300,
-                fit_columns_on_grid_load=True
+                fit_columns_on_grid_load=True,
             )
 
             # Extração dos riscos selecionados
@@ -102,13 +105,12 @@ def main():
             # Criação do Sankey (apenas para os riscos selecionados)
             if selected_rows:
                 selected_df = pd.DataFrame(selected_rows)
-                unique_risks = selected_df['nome_risco'].unique()
+                unique_risks = selected_df["nome_risco"].unique()
                 for risk in unique_risks:
-                    group = selected_df[selected_df['nome_risco'] == risk]
+                    group = selected_df[selected_df["nome_risco"] == risk]
                     # Como os dados já estão normalizados, extraímos os valores únicos
-                    unique_causes = group['causa'].dropna().unique().tolist()
-                    unique_cons = group['consequencia'].dropna(
-                    ).unique().tolist()
+                    unique_causes = group["causa"].dropna().unique().tolist()
+                    unique_cons = group["consequencia"].dropna().unique().tolist()
                     nodes = unique_causes + [risk] + unique_cons
                     N_c = len(unique_causes)
                     risk_index = N_c  # índice do nó do risco
@@ -118,8 +120,7 @@ def main():
                     values = [1] * N_c
                     # Links do risco para cada consequência
                     sources += [risk_index] * len(unique_cons)
-                    targets += [risk_index + 1 +
-                                i for i in range(len(unique_cons))]
+                    targets += [risk_index + 1 + i for i in range(len(unique_cons))]
                     values += [1] * len(unique_cons)
 
                     x_causes = [0] * N_c
@@ -131,26 +132,29 @@ def main():
                     x_positions = x_causes + x_risk + x_cons
                     y_positions = y_causes + y_risk + y_cons
 
-                    fig = go.Figure(data=[go.Sankey(
-                        arrangement="fixed",
-                        node=dict(
-                            pad=15,
-                            thickness=10,
-                            line=dict(color="black", width=1),
-                            label=nodes,
-                            color="skyblue",
-                            x=x_positions,
-                            y=y_positions
-                        ),
-                        link=dict(
-                            source=sources,
-                            target=targets,
-                            value=values,
-                            line=dict(color="black", width=1)
-                        )
-                    )])
-                    fig.update_layout(
-                        title_text=f"Sankey para Risco: {risk}", font_size=10)
+                    fig = go.Figure(
+                        data=[
+                            go.Sankey(
+                                arrangement="fixed",
+                                node=dict(
+                                    pad=15,
+                                    thickness=10,
+                                    line=dict(color="black", width=1),
+                                    label=nodes,
+                                    color="skyblue",
+                                    x=x_positions,
+                                    y=y_positions,
+                                ),
+                                link=dict(
+                                    source=sources,
+                                    target=targets,
+                                    value=values,
+                                    line=dict(color="black", width=1),
+                                ),
+                            )
+                        ]
+                    )
+                    fig.update_layout(title_text=f"Sankey para Risco: {risk}", font_size=10)
                     st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Selecione pelo menos um risco para visualizar o Sankey.")
@@ -164,22 +168,17 @@ def main():
                     if risk_id is not None and company_id is not None:
                         selected_ids.append((risk_id, company_id))
                     else:
-                        st.error(
-                            f"Chave 'id_risco' ou 'id_empresa' não encontrada na linha: {row}")
+                        st.error(f"Chave 'id_risco' ou 'id_empresa' não encontrada na linha: {row}")
                 else:
                     st.error(f"Tipo inesperado: {type(row)} - {row}")
 
-            st.write(
-                "IDs dos riscos selecionados (id_risco, id_empresa):", selected_ids)
+            st.write("IDs dos riscos selecionados (id_risco, id_empresa):", selected_ids)
 
             # Formulário para salvar os riscos selecionados
             with st.form(key="save_selected_form"):
-                usuario = st.text_input(
-                    "Usuário", value="usuario_padrão", key="input_usuario")
-                observacoes = st.text_area(
-                    "Observações (opcional)", key="input_observacoes")
-                submit_save = st.form_submit_button(
-                    "💾 Salvar Riscos Selecionados")
+                usuario = st.text_input("Usuário", value="usuario_padrão", key="input_usuario")
+                observacoes = st.text_area("Observações (opcional)", key="input_observacoes")
+                submit_save = st.form_submit_button("💾 Salvar Riscos Selecionados")
                 if submit_save:
                     create_table_query = """
                     CREATE TABLE IF NOT EXISTS tb_risco_selecionado (
@@ -200,15 +199,17 @@ def main():
                         INSERT INTO tb_risco_selecionado (id_empresa, id_risco, usuario, observacoes)
                         VALUES (%s, %s, %s, %s);
                         """
-                        params_insert = (company_id, risk_id,
-                                         usuario, observacoes)
+                        params_insert = (company_id, risk_id, usuario, observacoes)
                         run_query(insert_query, params_insert)
                         count += 1
                     st.success(
-                        f"{count} risco(s) selecionado(s) e associados à empresa com sucesso!")
+                        f"{count} risco(s) selecionado(s) e associados à empresa com sucesso!"
+                    )
 
     st.markdown("---")
-    st.write("Utilize esta ferramenta para buscar e associar riscos à sua empresa de forma inteligente (POC).")
+    st.write(
+        "Utilize esta ferramenta para buscar e associar riscos à sua empresa de forma inteligente (POC)."
+    )
 
 
 if __name__ == "__main__":

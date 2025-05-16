@@ -1,6 +1,5 @@
 import streamlit as st
-import pandas as pd
-from database_utils import run_select, run_query
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Avaliação de Riscos", layout="wide")
@@ -16,17 +15,14 @@ df_riscos = run_select(query_riscos)
 if df_riscos.empty:
     st.warning("⚠️ Nenhum risco cadastrado para avaliação.")
 else:
-    risco_selecionado = st.selectbox(
-        "Selecione um Risco para Avaliação", df_riscos["nome_risco"])
-    id_risco = df_riscos[df_riscos["nome_risco"]
-                         == risco_selecionado]["id_risco"].values[0]
+    risco_selecionado = st.selectbox("Selecione um Risco para Avaliação", df_riscos["nome_risco"])
+    id_risco = df_riscos[df_riscos["nome_risco"] == risco_selecionado]["id_risco"].values[0]
 
     probabilidade = st.slider("Probabilidade de Ocorrência (1 a 5)", 1, 5, 3)
-    impacto = st.selectbox("Impacto do Risco", [
-                           "Baixo", "Médio", "Alto", "Crítico"])
-    nivel_risco = probabilidade * \
-        (1 if impacto == "Baixo" else 2 if impacto ==
-         "Médio" else 3 if impacto == "Alto" else 4)
+    impacto = st.selectbox("Impacto do Risco", ["Baixo", "Médio", "Alto", "Crítico"])
+    nivel_risco = probabilidade * (
+        1 if impacto == "Baixo" else 2 if impacto == "Médio" else 3 if impacto == "Alto" else 4
+    )
 
     if st.button("💾 Salvar Avaliação"):
         query = """

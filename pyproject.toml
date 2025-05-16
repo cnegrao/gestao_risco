@@ -1,0 +1,27 @@
+[tool.ruff]
+src = ["app", "app_modules", "tests"]
+exclude = ["venv/", ".venv/"]
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "I", "D"]
+extend-ignore = ["E203"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "app_modules"]
+known-third-party = ["streamlit", "pandas", "plotly"]
+
+[tool.black]
+line-length = 100         # comprimento máximo de linha
+target-version = ["py310"] # versões alvo (opcional)
+include = '\.pyi?$'        # padrão de arquivos a formatar
+exclude = '''
+/(
+    \.venv
+  | venv
+  | build
+  | dist
+  | __pycache__
+  | \.git
+)/
+'''

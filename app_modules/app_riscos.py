@@ -1,6 +1,5 @@
 import streamlit as st
-import pandas as pd
-from database_utils import run_select, run_query
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Identificação de Riscos", layout="wide")
@@ -12,8 +11,10 @@ st.subheader("📌 Cadastro e Detalhamento do Risco")
 # Formulário para inserção de riscos
 nome_risco = st.text_input("Nome do Risco")
 descricao = st.text_area("Descrição do Risco")
-categoria = st.selectbox("Categoria do Risco", [
-                         "Operacional", "Financeiro", "Tecnológico", "Legal", "Estratégico"])
+categoria = st.selectbox(
+    "Categoria do Risco",
+    ["Operacional", "Financeiro", "Tecnológico", "Legal", "Estratégico"],
+)
 causas = st.text_area("Causas (separadas por vírgula)")
 consequencias = st.text_area("Consequências (separadas por vírgula)")
 
@@ -23,8 +24,7 @@ if st.button("💾 Salvar Risco"):
         INSERT INTO riscos (nome_risco, descricao, categoria, causas, consequencias, data_identificacao)
         VALUES (%s, %s, %s, %s, %s, CURRENT_DATE)
         """
-        run_query(query, (nome_risco, descricao,
-                  categoria, causas, consequencias))
+        run_query(query, (nome_risco, descricao, categoria, causas, consequencias))
         st.success("✅ Risco cadastrado com sucesso!")
     else:
         st.warning("⚠️ Preencha todos os campos obrigatórios.")

@@ -1,6 +1,5 @@
 import streamlit as st
-import pandas as pd
-from database_utils import run_select, run_query
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Validação do Plano de Controle", layout="wide")
@@ -16,13 +15,12 @@ if df_planos.empty:
     st.warning("⚠️ Nenhum plano pendente para validação.")
 else:
     plano_selecionado = st.selectbox(
-        "Selecione um Plano para Validação", df_planos["descricao_plano"])
-    id_plano = df_planos[df_planos["descricao_plano"]
-                         == plano_selecionado]["id_plano"].values[0]
+        "Selecione um Plano para Validação", df_planos["descricao_plano"]
+    )
+    id_plano = df_planos[df_planos["descricao_plano"] == plano_selecionado]["id_plano"].values[0]
 
     avaliacao = st.selectbox("Avaliação do Gestor", ["Aprovado", "Reprovado"])
-    justificativa = st.text_area(
-        "Justificativa (obrigatória em caso de reprovação)")
+    justificativa = st.text_area("Justificativa (obrigatória em caso de reprovação)")
 
     if st.button("💾 Registrar Validação"):
         if avaliacao == "Reprovado" and not justificativa:
@@ -53,7 +51,9 @@ else:
     st.info("Nenhuma validação registrada até o momento.")
 
 st.markdown("---")
-st.write("📊 Utilize esta tela para validar planos de controle e garantir a efetividade da gestão de riscos.")
+st.write(
+    "📊 Utilize esta tela para validar planos de controle e garantir a efetividade da gestão de riscos."
+)
 
 if __name__ == "__main__":
     st.write("Escolha uma opção no menu lateral para acessar outras funcionalidades.")

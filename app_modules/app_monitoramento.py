@@ -1,6 +1,6 @@
-import streamlit as st
 import pandas as pd
-from database_utils import run_select, run_query
+import streamlit as st
+from database_utils import run_query, run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Monitoramento de Riscos", layout="wide")
@@ -16,15 +16,17 @@ if df_acoes.empty:
     st.warning("⚠️ Nenhuma ação em andamento para monitoramento.")
 else:
     acao_selecionada = st.selectbox(
-        "Selecione uma Ação para Atualizar", df_acoes["descricao_plano"])
-    id_acao = df_acoes[df_acoes["descricao_plano"]
-                       == acao_selecionada]["id_plano"].values[0]
+        "Selecione uma Ação para Atualizar", df_acoes["descricao_plano"]
+    )
+    id_acao = df_acoes[df_acoes["descricao_plano"] == acao_selecionada]["id_plano"].values[0]
 
     novo_status = st.selectbox(
-        "Novo Status", ["Iniciado", "Em Andamento", "Concluído", "Cancelado"])
+        "Novo Status", ["Iniciado", "Em Andamento", "Concluído", "Cancelado"]
+    )
     observacoes = st.text_area("Observações sobre a Ação")
     data_acompanhamento = st.date_input(
-        "Data do Acompanhamento", min_value=pd.to_datetime("today").date())
+        "Data do Acompanhamento", min_value=pd.to_datetime("today").date()
+    )
 
     if st.button("💾 Atualizar Status"):
         query = """
@@ -32,8 +34,7 @@ else:
         SET status = %s, observacoes = %s, data_acompanhamento = %s 
         WHERE id_plano = %s
         """
-        run_query(query, (novo_status, observacoes,
-                  data_acompanhamento, id_acao))
+        run_query(query, (novo_status, observacoes, data_acompanhamento, id_acao))
         st.success("✅ Status atualizado com sucesso!")
 
 # ---------------------- Exibição do Monitoramento ----------------------
@@ -53,7 +54,9 @@ else:
     st.info("Nenhum acompanhamento registrado até o momento.")
 
 st.markdown("---")
-st.write("📊 Utilize esta tela para monitorar a execução das ações de mitigação e acompanhar o progresso dos planos de controle.")
+st.write(
+    "📊 Utilize esta tela para monitorar a execução das ações de mitigação e acompanhar o progresso dos planos de controle."
+)
 
 if __name__ == "__main__":
     st.write("Escolha uma opção no menu lateral para acessar outras funcionalidades.")

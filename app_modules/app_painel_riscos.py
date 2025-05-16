@@ -1,7 +1,5 @@
 import streamlit as st
-import pandas as pd
-from database_utils import run_select, run_query
-import datetime
+from database_utils import run_select
 
 # ---------------------- Configuração Inicial ----------------------
 st.set_page_config(page_title="Painel de Gestão de Riscos", layout="wide")
@@ -58,7 +56,9 @@ else:
     st.info("Nenhum risco de alto impacto detectado.")
 
 st.markdown("---")
-st.write("🔍 O painel de gestão de riscos exibe análises preditivas e permite uma visão estratégica dos riscos em tempo real.")
+st.write(
+    "🔍 O painel de gestão de riscos exibe análises preditivas e permite uma visão estratégica dos riscos em tempo real."
+)
 
 if __name__ == "__main__":
     st.write("Escolha uma opção no menu lateral para acessar módulos específicos.")
