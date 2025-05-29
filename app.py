@@ -22,7 +22,8 @@ logo_path = Path(__file__).parent / "imagens" / "logo.jpeg"
 if logo_path.exists():
     st.sidebar.image(str(logo_path), use_container_width=True)
 else:
-    st.sidebar.markdown("<div class='sidebar-logo-placeholder'></div>", unsafe_allow_html=True)
+    st.sidebar.markdown(
+        "<div class='sidebar-logo-placeholder'></div>", unsafe_allow_html=True)
 
 # 4️⃣ TÍTULO DA SIDEBAR
 st.sidebar.markdown("# Navegação por Fases")
@@ -45,7 +46,7 @@ page = st.sidebar.radio(
 
 # 6️⃣ BARRA SUPERIOR FIXA
 st.markdown(
-    '<div class="top-bar">' "<h1>SAFEBIS – SISTEMA DE GESTÃO DE RISCOS</h1>" "</div>",
+    '<div class="top-bar"><h1>SAFEBIS – SISTEMA DE GESTÃO DE RISCOS</h1></div>',
     unsafe_allow_html=True,
 )
 
@@ -55,7 +56,8 @@ if page == "Tela Inicial - Contexto de Riscos":
 
     riscos_dash()
 elif page == "Fase 1 - Estratégia":
-    from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
+    from app_modules.riscos_estrategia_associacao import \
+        riscos_estrategia_associacao
 
     riscos_estrategia_associacao()
 elif page == "Fase 2 - Riscos Controle Avaliação":
@@ -71,7 +73,8 @@ elif page == "Fase 4 - Avaliação de Riscos":
 
     riscos_avaliacao()
 elif page == "Fase 5 - Plano de Tratamento de Risco":
-    from app_modules.riscos_plano_tratamento import main as riscos_plano_tratamento
+    from app_modules.riscos_plano_tratamento import \
+        main as riscos_plano_tratamento
 
     riscos_plano_tratamento()
 elif page == "Fase 6 - Dashboard de Riscos":

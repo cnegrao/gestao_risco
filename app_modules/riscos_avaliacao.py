@@ -3,10 +3,11 @@ import sys
 
 import plotly.graph_objs as go
 import streamlit as st
-from database_utils import run_query, run_select
 
 from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
-from app_modules.riscos_estrategia_associacao import riscos_estrategia_associacao
+from app_modules.riscos_estrategia_associacao import \
+    riscos_estrategia_associacao
+from database_utils import run_query, run_select
 
 # Ajusta path para módulos
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +35,8 @@ def main_avaliacao():
         st.warning("⚠️ Nenhum risco cadastrado disponível.")
         return
 
-    escolha = st.selectbox("Selecione um risco:", df_riscos["nome_risco"], key="aval_risco")
+    escolha = st.selectbox("Selecione um risco:",
+                           df_riscos["nome_risco"], key="aval_risco")
     sel_row = df_riscos[df_riscos["nome_risco"] == escolha].iloc[0]
     id_r = int(sel_row["id_risco"])
     id_empresa = int(sel_row["id_empresa"])
@@ -50,7 +52,7 @@ def main_avaliacao():
               FROM tb_risco_meta rm
               JOIN tb_meta_estrategica m ON rm.id_meta = m.id_meta
               JOIN tb_objetivo_estrategico o ON m.id_objetivo = o.id_objetivo
-             WHERE rm.id_empresa=%s AND rm.id_risco=%s;
+             WHERE rm.id_empresa=%s AND rm.id_risco_selecionado=%s;
             """,
             (id_empresa, id_r),
         )
@@ -68,7 +70,7 @@ def main_avaliacao():
               FROM tb_risco_controle rc
               JOIN tb_situacao_controle sc ON rc.id_situacao_controle=sc.id_situacao_controle
               JOIN tb_execucao_controle ec ON rc.id_execucao_controle=ec.id_execucao_controle
-             WHERE rc.id_risco=%s;
+             WHERE rc.id_risco_selecionado=%s;
             """,
             (id_r,),
         )
@@ -94,7 +96,11 @@ def main_avaliacao():
     cls = (
         "Pequeno"
         if nivel <= 5
-        else "Moderado" if nivel <= 10 else "Alto" if nivel <= 15 else "Crítico"
+        else "Moderado"
+        if nivel <= 10
+        else "Alto"
+        if nivel <= 15
+        else "Crítico"
     )
 
     # Mapas de cor e ícones para classificação

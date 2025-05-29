@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 from psycopg2.pool import ThreadedConnectionPool
 
+# https://supabase.com/
 # Import opcional de Streamlit
 try:
     import streamlit as st
@@ -14,7 +15,8 @@ except ImportError:
     st = None
 
 # Configurações de logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s [%(levelname)s] %(message)s")
 
 BASE_DIR = Path(__file__).parent.resolve()
 INI_PATH = BASE_DIR / "config" / "config.ini"

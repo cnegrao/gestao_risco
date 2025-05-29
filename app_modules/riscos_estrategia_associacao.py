@@ -9,8 +9,7 @@ from database_utils import run_query, run_select
 
 
 def riscos_estrategia_associacao():
-    """
-    Tela de Associação Riscos ↔ Estratégia (multi-tenant SaaS).
+    """Tela de Associação Riscos ↔ Estratégia (multi-tenant SaaS).
     Permite CRUD de vínculos entre riscos e metas estratégicas.
     """
     # Injeção de CSS global
@@ -18,7 +17,7 @@ def riscos_estrategia_associacao():
     if css_path.exists():
         st.markdown(
             f"<style>{css_path.read_text(encoding='utf-8')}</style>",
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     # Cabeçalho
@@ -28,8 +27,7 @@ def riscos_estrategia_associacao():
 
     # ── 1️⃣ Selecione a Empresa
     emp_df = run_select(
-        "SELECT id_empresa, nome_empresa FROM tb_empresas ORDER BY nome_empresa;"
-    )
+        "SELECT id_empresa, nome_empresa FROM tb_empresas ORDER BY nome_empresa;")
     if emp_df.empty:
         st.error("Nenhuma empresa cadastrada.")
         return
@@ -42,7 +40,7 @@ def riscos_estrategia_associacao():
     # ── 2️⃣ Selecione o Risco
     riscos_df = run_select(
         "SELECT id_risco, nome_risco FROM tb_riscos WHERE id_empresa = %s ORDER BY id_risco;",
-        (id_empresa,)
+        (id_empresa,),
     )
     if riscos_df.empty:
         st.info("Nenhum risco cadastrado para esta empresa.")
@@ -56,11 +54,11 @@ def riscos_estrategia_associacao():
     # ── 3️⃣ Carrega Objetivos e Metas
     obj_df = run_select(
         "SELECT id_objetivo, descricao FROM tb_objetivo_estrategico WHERE id_empresa = %s ORDER BY id_objetivo;",
-        (id_empresa,)
+        (id_empresa,),
     )
     meta_df = run_select(
         "SELECT id_meta, id_objetivo, descricao FROM tb_meta_estrategica WHERE id_empresa = %s ORDER BY id_objetivo, id_meta;",
-        (id_empresa,)
+        (id_empresa,),
     )
     # garanta tipos inteiros
     obj_df["id_objetivo"] = obj_df["id_objetivo"].astype(int)
@@ -77,7 +75,8 @@ def riscos_estrategia_associacao():
         if "rea_is_edit" not in st.session_state:
             st.session_state["rea_is_edit"] = False
         st.session_state["rea_is_edit"] = st.checkbox(
-            "Editar Associação", value=st.session_state["rea_is_edit"], key="rea_edit")
+            "Editar Associação", value=st.session_state["rea_is_edit"], key="rea_edit"
+        )
 
         # seleção para edição (se houver)
         grid_sel = st.session_state.get(
@@ -104,12 +103,15 @@ def riscos_estrategia_associacao():
             default_idx = 0
             if selected:
                 # encontra índice da meta selecionada
-                match = metas_filtradas[metas_filtradas["id_meta"] == int(
-                    selected.get("id_meta", -1))]
+                match = metas_filtradas[
+                    metas_filtradas["id_meta"] == int(
+                        selected.get("id_meta", -1))
+                ]
                 if not match.empty:
                     default_idx = match.index[0]
             escolha_meta = st.selectbox(
-                "Meta Estratégica:", meta_opts, index=default_idx, key="rea_meta_sel")
+                "Meta Estratégica:", meta_opts, index=default_idx, key="rea_meta_sel"
+            )
             id_meta = int(metas_filtradas.loc[default_idx, "id_meta"])
 
             if st.form_submit_button("Salvar Associação"):
@@ -117,14 +119,18 @@ def riscos_estrategia_associacao():
                     if st.session_state["rea_is_edit"] and selected:
                         run_query(
                             "UPDATE tb_risco_meta SET id_meta = %s WHERE id_risco_meta = %s;",
-                            (id_meta, int(selected["id_risco_meta"]))
+                            (id_meta, int(selected["id_risco_meta"])),
                         )
                         st.success("Associação atualizada com sucesso.")
                     else:
                         run_query(
                             "INSERT INTO tb_risco_meta (id_empresa, id_risco, id_meta, usuario_criacao) VALUES (%s, %s, %s, %s);",
-                            (id_empresa, id_risco, id_meta,
-                             st.session_state.get("current_user", "script"))
+                            (
+                                id_empresa,
+                                id_risco,
+                                id_meta,
+                                st.session_state.get("current_user", "script"),
+                            ),
                         )
                         st.success("Associação criada com sucesso.")
                 except Exception as e:
@@ -155,7 +161,7 @@ def riscos_estrategia_associacao():
                AND rm.id_risco = %s
              ORDER BY rm.data_criacao DESC;
             """,
-            (id_empresa, id_risco)
+            (id_empresa, id_risco),
         )
         if assoc_df.empty:
             st.info("Nenhuma associação encontrada para este risco.")
@@ -177,7 +183,7 @@ def riscos_estrategia_associacao():
                 data_return_mode=DataReturnMode.AS_INPUT,
                 theme="ag-theme-alpine-dark",
                 height=300,
-                fit_columns_on_grid_load=True
+                fit_columns_on_grid_load=True,
             )
             st.session_state["assoc_grid"] = grid_resp
 
