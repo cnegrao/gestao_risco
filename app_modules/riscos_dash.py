@@ -1,12 +1,14 @@
 import plotly.graph_objs as go
 import streamlit as st
+
 from database_utils import run_select
 
 
 def main():
     # --- Header ---
     st.title("🛡️ Dashboard de Gestão de Riscos")
-    st.markdown("## Visão geral dos principais indicadores de risco e tratamento")
+    st.markdown(
+        "## Visão geral dos principais indicadores de risco e tratamento")
     st.markdown("---")
 
     # --- Top Metrics ---
@@ -143,12 +145,14 @@ def main():
     d1, d2 = st.columns(2)
     with d1:
         fig_d1 = go.Figure(
-            go.Pie(labels=df_cat["nome_categoria"], values=df_cat["total"], hole=0.5)
+            go.Pie(labels=df_cat["nome_categoria"],
+                   values=df_cat["total"], hole=0.5)
         )
         fig_d1.update_layout(title="Por Categoria (%)", margin=dict(t=30))
         st.plotly_chart(fig_d1, use_container_width=True)
     with d2:
-        fig_d2 = go.Figure(go.Pie(labels=df_area["nome_area"], values=df_area["total"], hole=0.5))
+        fig_d2 = go.Figure(
+            go.Pie(labels=df_area["nome_area"], values=df_area["total"], hole=0.5))
         fig_d2.update_layout(title="Por Área (%)", margin=dict(t=30))
         st.plotly_chart(fig_d2, use_container_width=True)
 
@@ -178,13 +182,13 @@ def main():
         q_heat = """
         WITH raw AS (
         SELECT
-            id_risco,
+            id_risco_selecionado,
             probabilidade,
             impacto_final,
             criticidade,
             data_avaliacao,
             ROW_NUMBER() OVER (
-            PARTITION BY id_risco
+            PARTITION BY id_risco_selecionado
             ORDER BY
                 CASE criticidade
                 WHEN 'Risco Alto'  THEN 3
@@ -196,7 +200,7 @@ def main():
         FROM public.tb_risco_avaliacoes
         WHERE criticidade IN ('Risco Baixo','Risco Médio','Risco Alto')
         ), sel AS (
-        SELECT id_risco, probabilidade, impacto_final, criticidade
+        SELECT id_risco_selecionado, probabilidade, impacto_final, criticidade
         FROM raw
         WHERE rn = 1
         )
@@ -233,7 +237,8 @@ def main():
         # Para o heatmap, precisamos de uma escala contínua – então vamos converter cada cor em três níveis:
         # 0=verde, 1=laranja, 2=vermelho
         crit_to_val = {"green": 0, "orange": 1, "red": 2}
-        z_val = [[crit_to_val.get(z_color[r][c], 0) for c in range(5)] for r in range(5)]
+        z_val = [[crit_to_val.get(z_color[r][c], 0)
+                  for c in range(5)] for r in range(5)]
 
         # Monta o gráfico
         fig = go.Figure(
@@ -260,7 +265,7 @@ def main():
                 text=z_count,
                 texttemplate="%{text}",
                 hovertemplate=(
-                    "Probabilidade: %{x}<br>" "Impacto: %{y}<br>" "Riscos: %{text}<extra></extra>"
+                    "Probabilidade: %{x}<br>Impacto: %{y}<br>Riscos: %{text}<extra></extra>"
                 ),
             )
         )

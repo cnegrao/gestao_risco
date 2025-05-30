@@ -44,9 +44,7 @@ CREATE TABLE {table} (
 );
 
 ALTER TABLE {table} OWNER TO postgres;
-""".format(
-    table=table_name, columns=",\n".join(cols_ddl)
-)
+""".format(table=table_name, columns=",\n".join(cols_ddl))
 
 # Salva DDL
 ddl_path = Path(r"D:\projetoGestaoRiscos\data\create_stg_analise_riscos_raw.sql")
