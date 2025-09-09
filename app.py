@@ -52,8 +52,8 @@ st.markdown(
 
 # 7️⃣ CHAMADA DAS PÁGINAS
 if page == "Fase 1 - Contexto de Riscos":
-    from app_modules.riscos_dash import main as riscos_dash
-    riscos_dash()
+    from app_modules.riscos_contexto import main as riscos_contexto
+    riscos_contexto()
 
 elif page == "Fase 2 - Estratégia":
     from app_modules.riscos_estrategia_associacao import \
