@@ -32,13 +32,13 @@ st.sidebar.markdown("# Navegação por Fases")
 page = st.sidebar.radio(
     "",
     [
-        "Tela Inicial - Contexto de Riscos",
-        "Fase 1 - Estratégia",
-        "Fase 2 - Riscos Controle Avaliação",
+        "Fase 1 - Contexto de Riscos",
+        "Fase 2 - Estratégia",
         "Fase 3 - Identificação de Riscos",
-        "Fase 4 - Avaliação de Riscos",
-        "Fase 5 - Plano de Tratamento de Risco",
-        "Fase 6 - Dashboard de Riscos",
+        "Fase 4 - Riscos Controle Avaliação",
+        "Fase 5 - Avaliação de Riscos",
+        "Fase 6 - Plano de Tratamento de Risco",
+        "Fase 7 - Dashboard de Riscos",
         "Gerenciamento de Usuários",
     ],
     index=0,
@@ -51,35 +51,34 @@ st.markdown(
 )
 
 # 7️⃣ CHAMADA DAS PÁGINAS
-if page == "Tela Inicial - Contexto de Riscos":
+if page == "Fase 1 - Contexto de Riscos":
     from app_modules.riscos_dash import main as riscos_dash
-
     riscos_dash()
-elif page == "Fase 1 - Estratégia":
+
+elif page == "Fase 2 - Estratégia":
     from app_modules.riscos_estrategia_associacao import \
         riscos_estrategia_associacao
-
     riscos_estrategia_associacao()
-elif page == "Fase 2 - Riscos Controle Avaliação":
-    from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
 
-    riscos_controle_avaliacao()
 elif page == "Fase 3 - Identificação de Riscos":
     from app_modules.riscos_identificacao import main as riscos_identificacao
-
     riscos_identificacao()
-elif page == "Fase 4 - Avaliação de Riscos":
-    from app_modules.riscos_avaliacao import main as riscos_avaliacao
 
+elif page == "Fase 4 - Riscos Controle Avaliação":
+    from app_modules.riscos_controle_avaliacao import riscos_controle_avaliacao
+    riscos_controle_avaliacao()
+
+elif page == "Fase 5 - Avaliação de Riscos":
+    from app_modules.riscos_avaliacao import main as riscos_avaliacao
     riscos_avaliacao()
-elif page == "Fase 5 - Plano de Tratamento de Risco":
+
+elif page == "Fase 6 - Plano de Tratamento de Risco":
     from app_modules.riscos_plano_tratamento import \
         main as riscos_plano_tratamento
-
     riscos_plano_tratamento()
-elif page == "Fase 6 - Dashboard de Riscos":
-    from app_modules.riscos_dash import main as riscos_dash
 
+elif page == "Fase 7 - Dashboard de Riscos":
+    from app_modules.riscos_dash import main as riscos_dash
     riscos_dash()
 # ... siga para as demais fases
 
