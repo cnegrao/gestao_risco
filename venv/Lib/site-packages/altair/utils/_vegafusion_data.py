@@ -70,15 +70,11 @@ _VegaFusionReturnType = Union[_ToVegaFusionReturnUrlDict, ToValuesReturnType]
 
 
 @overload
-def vegafusion_data_transformer(
-    data: None = ..., max_rows: int = ...
-) -> Callable[..., Any]: ...
+def vegafusion_data_transformer(data: None = ..., max_rows: int = ...) -> Callable[..., Any]: ...
 
 
 @overload
-def vegafusion_data_transformer(
-    data: DataFrameLike, max_rows: int = ...
-) -> ToValuesReturnType: ...
+def vegafusion_data_transformer(data: DataFrameLike, max_rows: int = ...) -> ToValuesReturnType: ...
 
 
 @overload
@@ -176,9 +172,7 @@ def get_inline_tables(vega_spec: dict[str, Any]) -> dict[str, DataFrameLike]:
     return {k: extracted_inline_tables.pop(k) for k in table_names}
 
 
-def compile_to_vegafusion_chart_state(
-    vegalite_spec: dict[str, Any], local_tz: str
-) -> ChartState:
+def compile_to_vegafusion_chart_state(vegalite_spec: dict[str, Any], local_tz: str) -> ChartState:
     """
     Compile a Vega-Lite spec to a VegaFusion ChartState.
 

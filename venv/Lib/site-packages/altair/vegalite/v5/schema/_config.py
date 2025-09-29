@@ -5384,11 +5384,7 @@ class ProjectionKwds(TypedDict, total=False):
         GeoJsonFeatureKwds
         | GeoJsonFeatureCollectionKwds
         | Sequence[GeoJsonFeatureKwds]
-        | Sequence[
-            GeoJsonFeatureKwds
-            | GeoJsonFeatureCollectionKwds
-            | Sequence[GeoJsonFeatureKwds]
-        ]
+        | Sequence[GeoJsonFeatureKwds | GeoJsonFeatureCollectionKwds | Sequence[GeoJsonFeatureKwds]]
     )
     fraction: float
     lobes: float
@@ -5527,11 +5523,7 @@ class ProjectionConfigKwds(TypedDict, total=False):
         GeoJsonFeatureKwds
         | GeoJsonFeatureCollectionKwds
         | Sequence[GeoJsonFeatureKwds]
-        | Sequence[
-            GeoJsonFeatureKwds
-            | GeoJsonFeatureCollectionKwds
-            | Sequence[GeoJsonFeatureKwds]
-        ]
+        | Sequence[GeoJsonFeatureKwds | GeoJsonFeatureCollectionKwds | Sequence[GeoJsonFeatureKwds]]
     )
     fraction: float
     lobes: float
@@ -7436,13 +7428,7 @@ class VariableParameterKwds(TypedDict, total=False):
     """
 
     name: str
-    bind: (
-        BindInputKwds
-        | BindRangeKwds
-        | BindDirectKwds
-        | BindCheckboxKwds
-        | BindRadioSelectKwds
-    )
+    bind: BindInputKwds | BindRangeKwds | BindDirectKwds | BindCheckboxKwds | BindRadioSelectKwds
     expr: str
     react: bool
     value: Any

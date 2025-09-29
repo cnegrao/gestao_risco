@@ -508,17 +508,11 @@ class _MarkDef(SchemaBase):
         color: Optional[str | Parameter | SchemaBase | Map | ColorName_T] = Undefined,
         continuousBandSize: Optional[float] = Undefined,
         cornerRadius: Optional[float | Parameter | SchemaBase | Map] = Undefined,
-        cornerRadiusBottomLeft: Optional[
-            float | Parameter | SchemaBase | Map
-        ] = Undefined,
-        cornerRadiusBottomRight: Optional[
-            float | Parameter | SchemaBase | Map
-        ] = Undefined,
+        cornerRadiusBottomLeft: Optional[float | Parameter | SchemaBase | Map] = Undefined,
+        cornerRadiusBottomRight: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         cornerRadiusEnd: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         cornerRadiusTopLeft: Optional[float | Parameter | SchemaBase | Map] = Undefined,
-        cornerRadiusTopRight: Optional[
-            float | Parameter | SchemaBase | Map
-        ] = Undefined,
+        cornerRadiusTopRight: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         cursor: Optional[Parameter | SchemaBase | Map | Cursor_T] = Undefined,
         description: Optional[str | Parameter | SchemaBase | Map] = Undefined,
         dir: Optional[Parameter | SchemaBase | Map | TextDirection_T] = Undefined,
@@ -526,9 +520,7 @@ class _MarkDef(SchemaBase):
         dx: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         dy: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         ellipsis: Optional[str | Parameter | SchemaBase | Map] = Undefined,
-        fill: Optional[
-            str | Parameter | SchemaBase | Map | ColorName_T | None
-        ] = Undefined,
+        fill: Optional[str | Parameter | SchemaBase | Map | ColorName_T | None] = Undefined,
         fillOpacity: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         filled: Optional[bool] = Undefined,
         font: Optional[str | Parameter | SchemaBase | Map] = Undefined,
@@ -558,13 +550,9 @@ class _MarkDef(SchemaBase):
         shape: Optional[str | Parameter | SchemaBase | Map] = Undefined,
         size: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         smooth: Optional[bool | Parameter | SchemaBase | Map] = Undefined,
-        stroke: Optional[
-            str | Parameter | SchemaBase | Map | ColorName_T | None
-        ] = Undefined,
+        stroke: Optional[str | Parameter | SchemaBase | Map | ColorName_T | None] = Undefined,
         strokeCap: Optional[Parameter | SchemaBase | Map | StrokeCap_T] = Undefined,
-        strokeDash: Optional[
-            Parameter | SchemaBase | Sequence[float] | Map
-        ] = Undefined,
+        strokeDash: Optional[Parameter | SchemaBase | Sequence[float] | Map] = Undefined,
         strokeDashOffset: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         strokeJoin: Optional[Parameter | SchemaBase | Map | StrokeJoin_T] = Undefined,
         strokeMiterLimit: Optional[float | Parameter | SchemaBase | Map] = Undefined,
@@ -581,25 +569,15 @@ class _MarkDef(SchemaBase):
         thickness: Optional[float] = Undefined,
         timeUnitBandPosition: Optional[float] = Undefined,
         timeUnitBandSize: Optional[float] = Undefined,
-        tooltip: Optional[
-            str | bool | float | Parameter | SchemaBase | Map | None
-        ] = Undefined,
+        tooltip: Optional[str | bool | float | Parameter | SchemaBase | Map | None] = Undefined,
         url: Optional[str | Parameter | SchemaBase | Map] = Undefined,
         width: Optional[float | Parameter | SchemaBase | Map] = Undefined,
-        x: Optional[
-            float | Parameter | SchemaBase | Literal["width"] | Map
-        ] = Undefined,
-        x2: Optional[
-            float | Parameter | SchemaBase | Literal["width"] | Map
-        ] = Undefined,
+        x: Optional[float | Parameter | SchemaBase | Literal["width"] | Map] = Undefined,
+        x2: Optional[float | Parameter | SchemaBase | Literal["width"] | Map] = Undefined,
         x2Offset: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         xOffset: Optional[float | Parameter | SchemaBase | Map] = Undefined,
-        y: Optional[
-            float | Parameter | SchemaBase | Literal["height"] | Map
-        ] = Undefined,
-        y2: Optional[
-            float | Parameter | SchemaBase | Literal["height"] | Map
-        ] = Undefined,
+        y: Optional[float | Parameter | SchemaBase | Literal["height"] | Map] = Undefined,
+        y2: Optional[float | Parameter | SchemaBase | Literal["height"] | Map] = Undefined,
         y2Offset: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         yOffset: Optional[float | Parameter | SchemaBase | Map] = Undefined,
         **kwds,

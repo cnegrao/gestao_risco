@@ -60,16 +60,12 @@ class SupportsGeoInterface(Protocol):
     __geo_interface__: MutableMapping
 
 
-DataType: TypeAlias = Union[
-    dict[Any, Any], IntoDataFrame, SupportsGeoInterface, DataFrameLike
-]
+DataType: TypeAlias = Union[dict[Any, Any], IntoDataFrame, SupportsGeoInterface, DataFrameLike]
 
 TDataType = TypeVar("TDataType", bound=DataType)
 TIntoDataFrame = TypeVar("TIntoDataFrame", bound=IntoDataFrame)
 
-VegaLiteDataDict: TypeAlias = dict[
-    str, Union[str, dict[Any, Any], list[dict[Any, Any]]]
-]
+VegaLiteDataDict: TypeAlias = dict[str, Union[str, dict[Any, Any], list[dict[Any, Any]]]]
 ToValuesReturnType: TypeAlias = dict[str, Union[dict[Any, Any], list[dict[Any, Any]]]]
 SampleReturnType = Union[IntoDataFrame, dict[str, Sequence], None]
 
@@ -120,9 +116,7 @@ class MaxRowsError(Exception):
 def limit_rows(data: None = ..., max_rows: int | None = ...) -> partial: ...
 @overload
 def limit_rows(data: DataType, max_rows: int | None = ...) -> DataType: ...
-def limit_rows(
-    data: DataType | None = None, max_rows: int | None = 5000
-) -> partial | DataType:
+def limit_rows(data: DataType | None = None, max_rows: int | None = 5000) -> partial | DataType:
     """
     Raise MaxRowsError if the data model has more than max_rows.
 
@@ -168,17 +162,13 @@ def limit_rows(
 
 
 @overload
-def sample(
-    data: None = ..., n: int | None = ..., frac: float | None = ...
-) -> partial: ...
+def sample(data: None = ..., n: int | None = ..., frac: float | None = ...) -> partial: ...
 @overload
 def sample(
     data: TIntoDataFrame, n: int | None = ..., frac: float | None = ...
 ) -> TIntoDataFrame: ...
 @overload
-def sample(
-    data: DataType, n: int | None = ..., frac: float | None = ...
-) -> SampleReturnType: ...
+def sample(data: DataType, n: int | None = ..., frac: float | None = ...) -> SampleReturnType: ...
 def sample(
     data: DataType | None = None,
     n: int | None = None,

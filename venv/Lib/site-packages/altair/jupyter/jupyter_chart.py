@@ -80,8 +80,7 @@ class Selections(traitlets.HasTraits):
         if change["name"] in self.traits() and change["old"] != change["new"]:
             self._set_value(change["name"], change["old"])
         msg = (
-            "Selections may not be set from Python.\n"
-            f"Attempted to set select: {change['name']}"
+            "Selections may not be set from Python.\n" f"Attempted to set select: {change['name']}"
         )
         raise ValueError(msg)
 
@@ -168,9 +167,7 @@ class JupyterChart(anywidget.AnyWidget):
             # vl-convert includes. To see the available imports and their imported names, run
             #       import vl_convert as vlc
             #       help(vlc.javascript_bundle)
-            bundled_src = vlc.javascript_bundle(
-                src, vl_version=vl_version_for_vl_convert()
-            )
+            bundled_src = vlc.javascript_bundle(src, vl_version=vl_version_for_vl_convert())
             cls._esm = bundled_src
             cls._is_offline = True
         else:
@@ -252,9 +249,7 @@ class JupyterChart(anywidget.AnyWidget):
 
                     select_type = select["type"]
                     if select_type == "point":
-                        if not (
-                            select.get("fields", None) or select.get("encodings", None)
-                        ):
+                        if not (select.get("fields", None) or select.get("encodings", None)):
                             # Point selection with no associated fields or encodings specified.
                             # This is an index-based selection
                             selection_types[clean_name] = "index"
@@ -319,27 +314,19 @@ class JupyterChart(anywidget.AnyWidget):
         if self.chart is not None:
             vegalite_spec = self.chart.to_dict(context={"pre_transform": False})
             with self.hold_sync():
-                self._chart_state = compile_to_vegafusion_chart_state(
-                    vegalite_spec, local_tz
-                )
-                self._js_watch_plan = self._chart_state.get_watch_plan()[
-                    "client_to_server"
-                ]
+                self._chart_state = compile_to_vegafusion_chart_state(vegalite_spec, local_tz)
+                self._js_watch_plan = self._chart_state.get_watch_plan()["client_to_server"]
                 self.spec = self._chart_state.get_transformed_spec()
 
                 # Callback to update chart state and send updates back to client
                 def on_js_to_py_updates(change):
                     if self.debug:
                         updates_str = json.dumps(change["new"], indent=2)
-                        print(
-                            f"JavaScript to Python VegaFusion updates:\n {updates_str}"
-                        )
+                        print(f"JavaScript to Python VegaFusion updates:\n {updates_str}")
                     updates = self._chart_state.update(change["new"])
                     if self.debug:
                         updates_str = json.dumps(updates, indent=2)
-                        print(
-                            f"Python to JavaScript VegaFusion updates:\n {updates_str}"
-                        )
+                        print(f"Python to JavaScript VegaFusion updates:\n {updates_str}")
                     self._py_to_js_updates = updates
 
                 self.observe(on_js_to_py_updates, ["_js_to_py_updates"])
@@ -369,9 +356,7 @@ class JupyterChart(anywidget.AnyWidget):
             elif selection_type == "interval":
                 self.selections._set_value(
                     selection_name,
-                    IntervalSelection.from_vega(
-                        selection_name, signal=value, store=store
-                    ),
+                    IntervalSelection.from_vega(selection_name, signal=value, store=store),
                 )
 
 

@@ -163,9 +163,7 @@ def transformed_data(chart, row_limit=None, exclude=None):
 # a very consistent behavior for overloaded functions.
 # The same error appeared when trying it with Protocols for the concat and layer charts.
 # This function is only used internally and so we accept this inconsistency for now.
-def name_views(
-    chart: ChartType, i: int = 0, exclude: Iterable[str] | None = None
-) -> list[str]:
+def name_views(chart: ChartType, i: int = 0, exclude: Iterable[str] | None = None) -> list[str]:
     """
     Name unnamed chart views.
 
@@ -190,9 +188,7 @@ def name_views(
         List of the names of the charts and subcharts
     """
     exclude = set(exclude) if exclude is not None else set()
-    if isinstance(
-        chart, (_chart_class_mapping[Chart], _chart_class_mapping[FacetChart])
-    ):
+    if isinstance(chart, (_chart_class_mapping[Chart], _chart_class_mapping[FacetChart])):
         if chart.name not in exclude:
             if chart.name in {None, Undefined}:
                 # Add name since none is specified
@@ -225,9 +221,7 @@ def name_views(
         return chart_names
 
 
-def get_group_mark_for_scope(
-    vega_spec: dict[str, Any], scope: Scope
-) -> dict[str, Any] | None:
+def get_group_mark_for_scope(vega_spec: dict[str, Any], scope: Scope) -> dict[str, Any] | None:
     """
     Get the group mark at a particular scope.
 
@@ -538,9 +532,7 @@ def get_datasets_for_view_names(
             if mark.get("name", "") == f"{vl_chart_name}_cell":
                 data_name = mark.get("from", {}).get("facet", None).get("data", None)
                 scoped_data_name = (data_name, scope)
-                datasets[vl_chart_name] = get_from_facet_mapping(
-                    scoped_data_name, facet_mapping
-                )
+                datasets[vl_chart_name] = get_from_facet_mapping(scoped_data_name, facet_mapping)
                 break
 
         name = mark.get("name", "")
@@ -555,9 +547,7 @@ def get_datasets_for_view_names(
             for vl_chart_name in vl_chart_names:
                 if name.startswith(vl_chart_name) and name.endswith("_marks"):
                     data_name = mark.get("from", {}).get("data", None)
-                    scoped_data = get_definition_scope_for_data_reference(
-                        group, data_name, scope
-                    )
+                    scoped_data = get_definition_scope_for_data_reference(group, data_name, scope)
                     if scoped_data is not None:
                         datasets[vl_chart_name] = get_from_facet_mapping(
                             (data_name, scoped_data), facet_mapping

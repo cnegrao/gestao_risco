@@ -109,9 +109,7 @@ def jupyter_renderer(spec: dict, **metadata):
     )._repr_mimebundle_()  # type: ignore[attr-defined]
 
 
-def browser_renderer(
-    spec: dict, offline=False, using=None, port=0, **metadata
-) -> dict[str, str]:
+def browser_renderer(spec: dict, offline=False, using=None, port=0, **metadata) -> dict[str, str]:
     from altair.utils._show import open_html_in_browser
 
     if offline:

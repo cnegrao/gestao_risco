@@ -74,9 +74,7 @@ class ThemeRegistry(PluginRegistry[Plugin[ThemeConfig], ThemeConfig]):
         "Deprecated since `altair=5.5.0`. Use @altair.theme.register instead.",
         category=None,
     )
-    def register(
-        self, name: str, value: Plugin[ThemeConfig] | None
-    ) -> Plugin[ThemeConfig] | None:
+    def register(self, name: str, value: Plugin[ThemeConfig] | None) -> Plugin[ThemeConfig] | None:
         return super().register(name, value)
 
 

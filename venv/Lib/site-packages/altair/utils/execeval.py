@@ -82,9 +82,7 @@ def eval_block(
 
     with catch_display:
         for node in to_eval:
-            compiled = compile(
-                ast.Interactive([node]), filename=filename, mode="single"
-            )
+            compiled = compile(ast.Interactive([node]), filename=filename, mode="single")
             exec(compiled, namespace)
 
     if strict:

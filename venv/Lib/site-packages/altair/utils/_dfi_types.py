@@ -124,9 +124,7 @@ class DataFrame(Protocol):
     to the dataframe interchange protocol specification.
     """
 
-    def __dataframe__(
-        self, nan_as_null: bool = False, allow_copy: bool = True
-    ) -> DataFrame:
+    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True) -> DataFrame:
         """
         Construct a new exchange object, potentially changing the parameters.
 

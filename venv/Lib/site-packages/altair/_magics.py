@@ -92,10 +92,7 @@ def vegalite(line, cell) -> vegalite_v5.VegaLite:
         try:
             spec = json.loads(cell)
         except json.JSONDecodeError as err:
-            msg = (
-                "%%vegalite: spec is not valid JSON. "
-                "Install pyyaml to parse spec as yaml"
-            )
+            msg = "%%vegalite: spec is not valid JSON. " "Install pyyaml to parse spec as yaml"
             raise ValueError(msg) from err
     else:
         import yaml

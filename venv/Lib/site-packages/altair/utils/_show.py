@@ -68,8 +68,6 @@ def open_html_in_browser(
             pass
 
     # Use specified port if provided, otherwise choose a random port (port value of 0)
-    server = HTTPServer(
-        ("127.0.0.1", port if port is not None else 0), OneShotRequestHandler
-    )
+    server = HTTPServer(("127.0.0.1", port if port is not None else 0), OneShotRequestHandler)
     browser.open(f"http://127.0.0.1:{server.server_port}")
     server.handle_request()

@@ -60,9 +60,7 @@ class PluginEnabler(Generic[PluginT, R]):
         # plugins back to original state
     """
 
-    def __init__(
-        self, registry: PluginRegistry[PluginT, R], name: str, **options: Any
-    ) -> None:
+    def __init__(self, registry: PluginRegistry[PluginT, R], name: str, **options: Any) -> None:
         self.registry: PluginRegistry[PluginT, R] = registry
         self.name: str = name
         self.options: dict[str, Any] = options
@@ -105,9 +103,7 @@ class PluginRegistry(Generic[PluginT, R]):
     # in the registry rather than passed to the plugins
     _global_settings: dict[str, Any] = {}
 
-    def __init__(
-        self, entry_point_group: str = "", plugin_type: IsPlugin = callable
-    ) -> None:
+    def __init__(self, entry_point_group: str = "", plugin_type: IsPlugin = callable) -> None:
         """
         Create a PluginRegistry for a named entry point group.
 
@@ -205,9 +201,7 @@ class PluginRegistry(Generic[PluginT, R]):
         if name not in self._plugins:
             try:
                 (ep,) = (
-                    ep
-                    for ep in importlib_metadata_get(self.entry_point_group)
-                    if ep.name == name
+                    ep for ep in importlib_metadata_get(self.entry_point_group) if ep.name == name
                 )
             except ValueError as err:
                 if name in self.entrypoint_err_messages:
@@ -222,9 +216,7 @@ class PluginRegistry(Generic[PluginT, R]):
             self._global_settings[key] = options.pop(key)
         self._options = options
 
-    def enable(
-        self, name: str | None = None, **options: Any
-    ) -> PluginEnabler[PluginT, R]:
+    def enable(self, name: str | None = None, **options: Any) -> PluginEnabler[PluginT, R]:
         """
         Enable a plugin by name.
 

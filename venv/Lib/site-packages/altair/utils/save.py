@@ -29,18 +29,13 @@ def write_file_or_filename(
         fp.write(content)
 
 
-def set_inspect_format_argument(
-    format: str | None, fp: str | Path | IO, inline: bool
-) -> str:
+def set_inspect_format_argument(format: str | None, fp: str | Path | IO, inline: bool) -> str:
     """Inspect the format argument in the save function."""
     if format is None:
         if isinstance(fp, (str, pathlib.Path)):
             format = pathlib.Path(fp).suffix.lstrip(".")
         else:
-            msg = (
-                "must specify file format: "
-                "['png', 'svg', 'pdf', 'html', 'json', 'vega']"
-            )
+            msg = "must specify file format: " "['png', 'svg', 'pdf', 'html', 'json', 'vega']"
             raise ValueError(msg)
 
     if format != "html" and inline:
@@ -147,9 +142,7 @@ def save(
     def perform_save() -> None:
         spec = chart.to_dict(context={"pre_transform": False})
 
-        inner_mode = set_inspect_mode_argument(
-            mode, embed_options or {}, spec, vegalite_version
-        )
+        inner_mode = set_inspect_mode_argument(mode, embed_options or {}, spec, vegalite_version)
 
         if format == "json":
             json_spec = json.dumps(spec, **json_kwds)
@@ -168,9 +161,7 @@ def save(
                 json_kwds=json_kwds,
                 **kwargs,
             )
-            write_file_or_filename(
-                fp, mb_html["text/html"], mode="w", encoding=encoding
-            )
+            write_file_or_filename(fp, mb_html["text/html"], mode="w", encoding=encoding)
         elif format == "png":
             mb_png = spec_to_mimebundle(
                 spec=spec,
@@ -201,9 +192,7 @@ def save(
             if format == "pdf":
                 write_file_or_filename(fp, mb_any["application/pdf"], mode="wb")
             else:
-                write_file_or_filename(
-                    fp, mb_any["image/svg+xml"], mode="w", encoding=encoding
-                )
+                write_file_or_filename(fp, mb_any["image/svg+xml"], mode="w", encoding=encoding)
         else:
             msg = f"Unsupported format: '{format}'"
             raise ValueError(msg)

@@ -161,54 +161,6 @@ def main_avaliacao():
         unsafe_allow_html=True,
     )
 
-    st.markdown("---")
-    # Monta matriz de contagem filtrada por processo
-    proc_df = run_select(
-        "SELECT sp.id_processo FROM tb_riscos r JOIN tb_subprocessos sp ON r.id_subprocesso=sp.id_subprocesso WHERE r.id_risco=%s;",
-        (id_r,),
-    )
-    if proc_df.empty:
-        st.error("⚠️ Processo não encontrado.")
-        return
-    pid = int(proc_df.iloc[0, 0])
-    all_df = run_select(
-        "SELECT r.probabilidade, GREATEST(r.impacto_financeiro, r.impacto_imagem, r.impacto_conformidade) AS impacto_final FROM tb_riscos r JOIN tb_subprocessos sp ON r.id_subprocesso=sp.id_subprocesso WHERE sp.id_processo=%s AND r.probabilidade IS NOT NULL;",
-        (pid,),
-    )
-    z = [[0] * 5 for _ in range(5)]
-    for _, r in all_df.iterrows():
-        try:
-            p = int(r.probabilidade) - 1
-            i = int(r.impacto_final) - 1
-        except:
-            continue
-        if 0 <= p < 5 and 0 <= i < 5:
-            z[4 - i][p] += 1
-    prob_labels = [str(x) for x in range(1, 6)]
-    y_labels = [str(x) for x in range(5, 0, -1)]
-    fig = go.Figure(
-        go.Heatmap(
-            x=prob_labels,
-            y=y_labels,
-            z=z,
-            text=z,
-            texttemplate="%{text}",
-            hovertemplate="Prob=%{x} Impacto=%{y}<br>Riscos=%{z}",
-            colorscale="Reds",
-            zmin=0,
-            zmax=max(max(row) for row in z),
-            showscale=True,
-        )
-    )
-    fig.update_layout(
-        title="Matriz de Riscos por Quadrante (Contagem)",
-        xaxis_title="Probabilidade",
-        yaxis_title="Impacto",
-        yaxis=dict(autorange=False),
-    )
-    st.subheader("Distribuição de Riscos no Processo")
-    st.plotly_chart(fig, use_container_width=True)
-
 
 def main():
     st.sidebar.title("Navegação")

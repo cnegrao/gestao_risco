@@ -508,9 +508,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("log", (value,))
 
     @classmethod
-    def max(
-        cls, value1: IntoExpression, value2: IntoExpression, *args: Any
-    ) -> Expression:
+    def max(cls, value1: IntoExpression, value2: IntoExpression, *args: Any) -> Expression:
         """
         Returns the maximum argument value.
 
@@ -522,9 +520,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("max", (value1, value2, *args))
 
     @classmethod
-    def min(
-        cls, value1: IntoExpression, value2: IntoExpression, *args: Any
-    ) -> Expression:
+    def min(cls, value1: IntoExpression, value2: IntoExpression, *args: Any) -> Expression:
         """
         Returns the minimum argument value.
 
@@ -748,9 +744,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("quantileLogNormal", (probability, mean, stdev))
 
     @classmethod
-    def sampleUniform(
-        cls, min: IntoExpression = None, max: IntoExpression = None, /
-    ) -> Expression:
+    def sampleUniform(cls, min: IntoExpression = None, max: IntoExpression = None, /) -> Expression:
         """
         Returns a sample from a univariate `continuous uniform probability distribution`_ over the interval [``min``, ``max``).
 
@@ -841,9 +835,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
 
         The ``month`` is 0-based, such that ``1`` represents February.
         """
-        return FunctionExpression(
-            "datetime", (year, month, day, hour, min, sec, millisec)
-        )
+        return FunctionExpression("datetime", (year, month, day, hour, min, sec, millisec))
 
     @classmethod
     def date(cls, datetime: IntoExpression, /) -> Expression:
@@ -1096,9 +1088,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("inrange", (value, range))
 
     @classmethod
-    def join(
-        cls, array: IntoExpression, separator: IntoExpression = None, /
-    ) -> Expression:
+    def join(cls, array: IntoExpression, separator: IntoExpression = None, /) -> Expression:
         """Returns a new string by concatenating all of the elements of the input ``array``, separated by commas or a specified ``separator`` string."""
         return FunctionExpression("join", (array, separator))
 
@@ -1369,9 +1359,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("timeUnitSpecifier", (units, specifiers))
 
     @classmethod
-    def timeFormat(
-        cls, value: IntoExpression, specifier: IntoExpression, /
-    ) -> Expression:
+    def timeFormat(cls, value: IntoExpression, specifier: IntoExpression, /) -> Expression:
         """
         Formats a datetime ``value`` (either a ``Date`` object or timestamp) as a string, according to the local time.
 
@@ -1387,9 +1375,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("timeFormat", (value, specifier))
 
     @classmethod
-    def timeParse(
-        cls, string: IntoExpression, specifier: IntoExpression, /
-    ) -> Expression:
+    def timeParse(cls, string: IntoExpression, specifier: IntoExpression, /) -> Expression:
         """
         Parses a ``string`` value to a Date object, according to the local time.
 
@@ -1402,9 +1388,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("timeParse", (string, specifier))
 
     @classmethod
-    def utcFormat(
-        cls, value: IntoExpression, specifier: IntoExpression, /
-    ) -> Expression:
+    def utcFormat(cls, value: IntoExpression, specifier: IntoExpression, /) -> Expression:
         """
         Formats a datetime ``value`` (either a ``Date`` object or timestamp) as a string, according to `UTC`_ time.
 
@@ -1422,9 +1406,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("utcFormat", (value, specifier))
 
     @classmethod
-    def utcParse(
-        cls, value: IntoExpression, specifier: IntoExpression, /
-    ) -> Expression:
+    def utcParse(cls, value: IntoExpression, specifier: IntoExpression, /) -> Expression:
         """
         Parses a *string* value to a Date object, according to `UTC`_ time.
 
@@ -1439,9 +1421,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("utcParse", (value, specifier))
 
     @classmethod
-    def regexp(
-        cls, pattern: IntoExpression, flags: IntoExpression = None, /
-    ) -> Expression:
+    def regexp(cls, pattern: IntoExpression, flags: IntoExpression = None, /) -> Expression:
         """
         Creates a regular expression instance from an input ``pattern`` string and optional ``flags``.
 
@@ -1453,9 +1433,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("regexp", (pattern, flags))
 
     @classmethod
-    def test(
-        cls, regexp: IntoExpression, string: IntoExpression = None, /
-    ) -> Expression:
+    def test(cls, regexp: IntoExpression, string: IntoExpression = None, /) -> Expression:
         r"""
         Evaluates a regular expression ``regexp`` against the input ``string``, returning ``true`` if the string matches the pattern, ``false`` otherwise.
 
@@ -1546,9 +1524,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("luminance", (specifier,))
 
     @classmethod
-    def contrast(
-        cls, specifier1: IntoExpression, specifier2: IntoExpression, /
-    ) -> Expression:
+    def contrast(cls, specifier1: IntoExpression, specifier2: IntoExpression, /) -> Expression:
         """
         Returns the contrast ratio between the input color specifiers as a float between 1 and 21.
 
@@ -1685,9 +1661,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("copy", (name, group))
 
     @classmethod
-    def domain(
-        cls, name: IntoExpression, group: IntoExpression = None, /
-    ) -> Expression:
+    def domain(cls, name: IntoExpression, group: IntoExpression = None, /) -> Expression:
         """
         Returns the scale domain array for the named scale transform, or an empty array if the scale is not found.
 
@@ -1707,9 +1681,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("range", (name, group))
 
     @classmethod
-    def bandwidth(
-        cls, name: IntoExpression, group: IntoExpression = None, /
-    ) -> Expression:
+    def bandwidth(cls, name: IntoExpression, group: IntoExpression = None, /) -> Expression:
         """
         Returns the current band width for the named band scale transform, or zero if the scale is not found or is not a band scale.
 
@@ -1940,9 +1912,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("geoCentroid", (projection, feature, group))
 
     @classmethod
-    def geoScale(
-        cls, projection: IntoExpression, group: IntoExpression = None, /
-    ) -> Expression:
+    def geoScale(cls, projection: IntoExpression, group: IntoExpression = None, /) -> Expression:
         """
         Returns the scale value for the named ``projection``.
 
@@ -1993,9 +1963,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("windowSize", ())
 
     @classmethod
-    def warn(
-        cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any
-    ) -> Expression:
+    def warn(cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any) -> Expression:
         """
         Logs a warning message and returns the last argument.
 
@@ -2005,9 +1973,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("warn", (value1, value2, *args))
 
     @classmethod
-    def info(
-        cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any
-    ) -> Expression:
+    def info(cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any) -> Expression:
         """
         Logs an informative message and returns the last argument.
 
@@ -2017,9 +1983,7 @@ class expr(_ExprRef, metaclass=_ExprMeta):
         return FunctionExpression("info", (value1, value2, *args))
 
     @classmethod
-    def debug(
-        cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any
-    ) -> Expression:
+    def debug(cls, value1: IntoExpression, value2: IntoExpression = None, *args: Any) -> Expression:
         """
         Logs a debugging message and returns the last argument.
 

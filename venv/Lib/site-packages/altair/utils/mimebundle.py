@@ -14,9 +14,7 @@ if TYPE_CHECKING:
     else:
         from typing_extensions import TypeAlias
 
-MimeBundleFormat: TypeAlias = Literal[
-    "html", "json", "png", "svg", "pdf", "vega", "vega-lite"
-]
+MimeBundleFormat: TypeAlias = Literal["html", "json", "png", "svg", "pdf", "vega", "vega-lite"]
 
 
 @overload
@@ -166,10 +164,7 @@ def spec_to_mimebundle(
     elif format == "json":
         return {"application/json": spec}
     else:
-        msg = (
-            "format must be one of "
-            "['html', 'json', 'png', 'svg', 'pdf', 'vega', 'vega-lite']"
-        )
+        msg = "format must be one of " "['html', 'json', 'png', 'svg', 'pdf', 'vega', 'vega-lite']"
         raise ValueError(msg)
 
 
@@ -258,9 +253,7 @@ def _spec_to_mimebundle_with_engine(
                 )
             factor = ppi / default_ppi
             w, h = _pngxy(png)
-            return {"image/png": png}, {
-                "image/png": {"width": w / factor, "height": h / factor}
-            }
+            return {"image/png": png}, {"image/png": {"width": w / factor, "height": h / factor}}
         elif format == "pdf":
             scale = kwargs.get("scale_factor", 1)
             if mode == "vega":
@@ -310,9 +303,7 @@ def _validate_normalize_engine(
         vlc = None
 
     # Normalize engine string by lower casing and removing underscores and hyphens
-    normalized_engine = (
-        None if engine is None else engine.lower().replace("-", "").replace("_", "")
-    )
+    normalized_engine = None if engine is None else engine.lower().replace("-", "").replace("_", "")
 
     # Validate or infer default value of normalized_engine
     if normalized_engine == "vlconvert":
@@ -370,8 +361,6 @@ def preprocess_embed_options(embed_options: dict) -> dict:
     time_format_locale = embed_options.get("timeFormatLocale", None)
     if isinstance(time_format_locale, str):
         vlc = import_vl_convert()
-        embed_options["timeFormatLocale"] = vlc.get_time_format_locale(
-            time_format_locale
-        )
+        embed_options["timeFormatLocale"] = vlc.get_time_format_locale(time_format_locale)
 
     return embed_options

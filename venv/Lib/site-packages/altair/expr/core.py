@@ -277,6 +277,4 @@ class GetItemExpression(Expression):
         return f"{self.group}[{self.name!r}]"
 
 
-IntoExpression: TypeAlias = Union[
-    "PrimitiveValue_T", dt.date, dt.datetime, OperatorMixin, "Map"
-]
+IntoExpression: TypeAlias = Union["PrimitiveValue_T", dt.date, dt.datetime, OperatorMixin, "Map"]
