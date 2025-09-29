@@ -20,7 +20,8 @@ else:
 # 3️⃣ LOGO NA SIDEBAR
 logo_path = Path(__file__).parent / "imagens" / "logo.jpeg"
 if logo_path.exists():
-    st.sidebar.image(str(logo_path), use_container_width=True)
+    # use_container_width removido → substituído por largura fixa
+    st.sidebar.image(str(logo_path), width=200)
 else:
     st.sidebar.markdown(
         "<div class='sidebar-logo-placeholder'></div>", unsafe_allow_html=True)
